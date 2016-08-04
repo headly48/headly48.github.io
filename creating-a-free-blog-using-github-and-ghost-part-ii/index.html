@@ -1,0 +1,266 @@
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>Creating a free blog using github and ghost. Part II</title>
+    <meta name="description" content="">
+
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="shortcut icon" href="../favicon.ico">
+
+    <link rel="stylesheet" type="text/css" href="../assets/css/screen.css?v=305d12763d">
+    <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic%7COpen+Sans:700,400">
+
+    <link rel="canonical" href="http://headly48.github.io/creating-a-free-blog-using-github-and-ghost-part-ii/">
+    <meta name="referrer" content="origin">
+    
+    <meta property="og:site_name" content="Josh's Tech Blog">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Creating a free blog using github and ghost. Part II">
+    <meta property="og:description" content="In the last post I went through the steps on how to set up a blog using github pages. Which can be found here In this post I'm going to continue with setting up my blog by adding a few more features. Adding Comments Whats a blog without comments? In">
+    <meta property="og:url" content="http://headly48.github.io/creating-a-free-blog-using-github-and-ghost-part-ii/">
+    <meta property="article:published_time" content="2016-08-04T12:07:49.837Z">
+    <meta property="article:modified_time" content="2016-08-04T12:09:14.110Z">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Creating a free blog using github and ghost. Part II">
+    <meta name="twitter:description" content="In the last post I went through the steps on how to set up a blog using github pages. Which can be found here In this post I'm going to continue with setting up my blog by adding a few more features. Adding Comments Whats a blog without comments? In">
+    <meta name="twitter:url" content="http://headly48.github.io/creating-a-free-blog-using-github-and-ghost-part-ii/">
+    <meta name="twitter:label1" content="Written by">
+    <meta name="twitter:data1" content="Joshua Head">
+    
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "Josh&#x27;s Tech Blog",
+        "logo": "http://headly48.github.io/ghost/img/ghosticon.jpg"
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Joshua Head",
+        "url": "http://headly48.github.io/author/joshua/",
+        "sameAs": []
+    },
+    "headline": "Creating a free blog using github and ghost. Part II",
+    "url": "http://headly48.github.io/creating-a-free-blog-using-github-and-ghost-part-ii/",
+    "datePublished": "2016-08-04T12:07:49.837Z",
+    "dateModified": "2016-08-04T12:09:14.110Z",
+    "description": "In the last post I went through the steps on how to set up a blog using github pages. Which can be found here In this post I&#x27;m going to continue with setting up my blog by adding a few more features. Adding Comments Whats a blog without comments? In"
+}
+    </script>
+
+    <meta name="generator" content="Ghost 0.8">
+    <link rel="alternate" type="application/rss+xml" title="Josh's Tech Blog" href="http://headly48.github.io/rss/">
+</head>
+<body class="post-template nav-closed">
+
+    <div class="nav">
+    <h3 class="nav-title">Menu</h3>
+    <a href="index.html#" class="nav-close">
+        <span class="hidden">Close</span>
+    </a>
+    <ul>
+            <li class="nav-home" role="presentation"><a href="http://headly48.github.io/">Home</a></li>
+    </ul>
+        <a class="subscribe-button icon-feed" href="http://headly48.github.io/rss/">Subscribe</a>
+</div>
+<span class="nav-cover"></span>
+
+
+    <div class="site-wrapper">
+
+        
+
+
+<header class="main-header post-head no-cover">
+    <nav class="main-nav  clearfix">
+        
+            <a class="menu-button icon-menu" href="index.html#"><span class="word">Menu</span></a>
+    </nav>
+</header>
+
+<main class="content" role="main">
+    <article class="post">
+
+        <header class="post-header">
+            <h1 class="post-title">Creating a free blog using github and ghost. Part II</h1>
+            <section class="post-meta">
+                <time class="post-date" datetime="2016-08-04">04 August 2016</time> 
+            </section>
+        </header>
+
+        <section class="post-content">
+            <p>In the last post I went through the steps on how to set up a blog using github pages. Which can be found <a href="https://headly48.github.io/creating-a-free-blog-using-github-and-ghost/">here</a></p>
+
+<p>In this post I'm going to continue with setting up my blog by adding a few more features.</p>
+
+<h6 id="addingcomments">Adding Comments</h6>
+
+<p>Whats a blog without comments?</p>
+
+<p>In order to add comments I used <a href="https://disqus.com/">Disqus</a> due to it being very easy to integrate and is more or less plug and play.</p>
+
+<p>The first step is to head over and register an account <a href="https://disqus.com/">here</a>. Once done go ahead and click the "I want to install disqus on my site" option. This will take you to a simple form where you specify your github site url.</p>
+
+<p>Make sure you take a note of your unique disqus url which is present underneath the website name input box. You will require this later.</p>
+
+<p>Once created head to the directory you pointed your docker file location. In my case i previously set it up to be  in the directory "Users/headly48/Documents/blog/ghost".</p>
+
+<p>Now go into "themese/casper" and open post.hbs file in your favorite editor.</p>
+
+<p>Find where the code below appears  </p>
+
+<pre><code class="language-       "> &lt;section class="post-content"&gt;
+   {{content}}
+ &lt;/section&gt;
+</code></pre>
+
+<p>And past in </p>
+
+<pre><code>        &lt;div id="disqus_thread"&gt;&lt;/div&gt;
+        &lt;script type="text/javascript"&gt;
+            var disqus_shortname = 'https-headly-github-io'; // required: replace example with your forum shortname
+            var disqus_identifier = '{{post.id}}';
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function() {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        &lt;/script&gt;
+        &lt;noscript&gt;Please enable JavaScript to view the &lt;a href="http://disqus.com/?ref_noscript"&gt;comments powered by Disqus.&lt;/a&gt;&lt;/noscript&gt;
+        &lt;a href="http://disqus.com" class="dsq-brlink"&gt;comments powered by &lt;span class="logo-disqus"&gt;Disqus&lt;/span&gt;&lt;/a&gt;
+</code></pre>
+
+<p>Now replace the disqus_shortname variable in the third line to be the same as the unique url you got when registering and save the file.</p>
+
+<p>Have a look at your first post and make sure the comments section is loading properly </p>
+
+<p>then go ahead and run the same buster-build-static script and buster deploy script as run previously</p>
+
+<h6 id="addingyourblogtogoogle">Adding your blog to google</h6>
+
+<p>In order to let people search and have your blog appear on google in the search results you need a sitemap xml which allows the search engines crawlers to easily find the content.</p>
+
+<p>Unfortunately buster out of the box does not generate the sitemaps so we need to add it to our script</p>
+
+<p>At the top under the buster generate command add the following snippet</p>
+
+<pre><code> # Copy sitemap files
+wget --convert-links --page-requisites --no-parent --directory-prefix static --no-host-directories --restrict-file-name=unix http://127.0.0.1:9050/sitemap.xsl  
+wget --convert-links --page-requisites --no-parent --directory-prefix static --no-host-directories --restrict-file-name=unix http://127.0.0.1:9050/sitemap.xml  
+wget --convert-links --page-requisites --no-parent --directory-prefix static --no-host-directories --restrict-file-name=unix http://localhost:9050/sitemap-pages.xml  
+wget --convert-links --page-requisites --no-parent --directory-prefix static --no-host-directories --restrict-file-name=unix http://localhost:9050/sitemap-posts.xml  
+wget --convert-links --page-requisites --no-parent --directory-prefix static --no-host-directories --restrict-file-name=unix http://localhost:9050/sitemap-authors.xml  
+wget --convert-links --page-requisites --no-parent --directory-prefix static --no-host-directories --restrict-file-name=unix http://localhost:9050/sitemap-tags.xml  
+</code></pre>
+
+<p>Now save and run the script.</p>
+
+<p>Next we need to tell google that our site is ours so that we can access stats and point it to our sitemaps.</p>
+
+<p>Head to googles <a href="https://www.google.com/webmasters/tools/home">web master tools</a> and click the add property button and insert your github page url.</p>
+
+<p>Next you should be prompted to verify ownership. They recommend to add in a html file to your site however if you go to the alternative tab you will find a meta tag which looks something like.</p>
+
+<p><code>&lt;meta name="google-site-verification" content="mV9dWaG3eoW-q9NUnP6Radwdw6R1_db0" /&gt;</code></p>
+
+<p>Copy this.</p>
+
+<p>Go to your static directory generated by buster and edit your index.html file and paste this tag to somewhere in head tags.</p>
+
+<p>Now run your scripts and deploy your changes to github.</p>
+
+<p>Go back to your google verify page and click verify and you should now be registered.</p>
+
+<p>To let google know about your sitemaps created before go to crawl on the left navigation bar and then sitemaps.</p>
+
+<p>Click add sitemap and enter in "/sitemap.xml" into the box. </p>
+
+<p>Now just wait for google to index your site. The google webmaster tools also allows you to check out the stats on your links to see how many people are coming to the site and how often you appear in the search rankings as well as what the users are searching for.</p>
+
+<p>Try out my new comment section below and hopefully it should work..</p>
+        </section>
+
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            var disqus_shortname = 'https-headly48-github-io'; // required: replace example with your forum shortname
+            var disqus_identifier = '';
+         
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function() {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+        <footer class="post-footer">
+
+
+
+            <section class="author">
+                <h4><a href="../author/joshua/">Joshua Head</a></h4>
+
+                    <p>Read <a href="../author/joshua/">more posts</a> by this author.</p>
+                <div class="author-meta">
+                    
+                    
+                </div>
+            </section>
+
+
+            <section class="share">
+                <h4>Share this post</h4>
+                <a class="icon-twitter" href="https://twitter.com/intent/tweet?text=Creating%20a%20free%20blog%20using%20github%20and%20ghost.%20Part%20II&amp;url=http://headly48.github.io/creating-a-free-blog-using-github-and-ghost-part-ii/" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                    <span class="hidden">Twitter</span>
+                </a>
+                <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://headly48.github.io/creating-a-free-blog-using-github-and-ghost-part-ii/" onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                    <span class="hidden">Facebook</span>
+                </a>
+                <a class="icon-google-plus" href="https://plus.google.com/share?url=http://headly48.github.io/creating-a-free-blog-using-github-and-ghost-part-ii/" onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+                    <span class="hidden">Google+</span>
+                </a>
+            </section>
+
+
+        </footer>
+
+    </article>
+
+</main>
+
+<aside class="read-next">
+    <a class="read-next-story prev no-cover" href="../creating-a-free-blog-using-github-and-ghost/">
+        <section class="post">
+            <h2>Creating a free blog using github and ghost</h2>
+            <p>As this is the first blog post it seems fitting to talk about how to set up a free…</p>
+        </section>
+    </a>
+</aside>
+
+
+
+        <footer class="site-footer clearfix">
+            <section class="copyright"><a href="http://headly48.github.io">Josh's Tech Blog</a> © 2016</section>
+            <section class="poweredby">Proudly published with <a href="https://ghost.org">Ghost</a></section>
+        </footer>
+
+    </div>
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+    
+    <script type="text/javascript" src="../assets/js/jquery.fitvids.js?v=305d12763d"></script>
+    <script type="text/javascript" src="../assets/js/index.js?v=305d12763d"></script>
+
+</body>

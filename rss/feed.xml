@@ -1,4 +1,102 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0" xmlns:media="http://search.yahoo.com/mrss/"><channel><title><![CDATA[Josh's Tech Blog]]></title><description><![CDATA[Experimenting with different techs]]></description><link>http://localhost:2368/</link><generator>Ghost 0.8</generator><lastBuildDate>Thu, 04 Aug 2016 11:08:10 GMT</lastBuildDate><atom:link href="http://localhost:2368/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Creating a free blog using github and ghost]]></title><description><![CDATA[<p>As this is the first blog post it seems fitting to talk about how to set up a free blog using github.</p>
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0" xmlns:media="http://search.yahoo.com/mrss/"><channel><title><![CDATA[Josh's Tech Blog]]></title><description><![CDATA[Experimenting with different techs]]></description><link>http://localhost:2368/</link><generator>Ghost 0.8</generator><lastBuildDate>Thu, 04 Aug 2016 12:09:24 GMT</lastBuildDate><atom:link href="http://localhost:2368/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Creating a free blog using github and ghost. Part II]]></title><description><![CDATA[<p>In the last post I went through the steps on how to set up a blog using github pages. Which can be found <a href="https://headly48.github.io/creating-a-free-blog-using-github-and-ghost/">here</a></p>
+
+<p>In this post I'm going to continue with setting up my blog by adding a few more features.</p>
+
+<h6 id="addingcomments">Adding Comments</h6>
+
+<p>Whats a blog without comments?</p>
+
+<p>In</p>]]></description><link>http://localhost:2368/creating-a-free-blog-using-github-and-ghost-part-ii/</link><guid isPermaLink="false">4c203802-268b-43e5-876d-2fae0bcf2a47</guid><dc:creator><![CDATA[Joshua Head]]></dc:creator><pubDate>Thu, 04 Aug 2016 12:07:49 GMT</pubDate><content:encoded><![CDATA[<p>In the last post I went through the steps on how to set up a blog using github pages. Which can be found <a href="https://headly48.github.io/creating-a-free-blog-using-github-and-ghost/">here</a></p>
+
+<p>In this post I'm going to continue with setting up my blog by adding a few more features.</p>
+
+<h6 id="addingcomments">Adding Comments</h6>
+
+<p>Whats a blog without comments?</p>
+
+<p>In order to add comments I used <a href="https://disqus.com/">Disqus</a> due to it being very easy to integrate and is more or less plug and play.</p>
+
+<p>The first step is to head over and register an account <a href="https://disqus.com/">here</a>. Once done go ahead and click the "I want to install disqus on my site" option. This will take you to a simple form where you specify your github site url.</p>
+
+<p>Make sure you take a note of your unique disqus url which is present underneath the website name input box. You will require this later.</p>
+
+<p>Once created head to the directory you pointed your docker file location. In my case i previously set it up to be  in the directory "Users/headly48/Documents/blog/ghost".</p>
+
+<p>Now go into "themese/casper" and open post.hbs file in your favorite editor.</p>
+
+<p>Find where the code below appears  </p>
+
+<pre><code class="language-       "> &lt;section class="post-content"&gt;
+   {{content}}
+ &lt;/section&gt;
+</code></pre>
+
+<p>And past in </p>
+
+<pre><code>        &lt;div id="disqus_thread"&gt;&lt;/div&gt;
+        &lt;script type="text/javascript"&gt;
+            var disqus_shortname = 'https-headly-github-io'; // required: replace example with your forum shortname
+            var disqus_identifier = '{{post.id}}';
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function() {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        &lt;/script&gt;
+        &lt;noscript&gt;Please enable JavaScript to view the &lt;a href="http://disqus.com/?ref_noscript"&gt;comments powered by Disqus.&lt;/a&gt;&lt;/noscript&gt;
+        &lt;a href="http://disqus.com" class="dsq-brlink"&gt;comments powered by &lt;span class="logo-disqus"&gt;Disqus&lt;/span&gt;&lt;/a&gt;
+</code></pre>
+
+<p>Now replace the disqus_shortname variable in the third line to be the same as the unique url you got when registering and save the file.</p>
+
+<p>Have a look at your first post and make sure the comments section is loading properly </p>
+
+<p>then go ahead and run the same buster-build-static script and buster deploy script as run previously</p>
+
+<h6 id="addingyourblogtogoogle">Adding your blog to google</h6>
+
+<p>In order to let people search and have your blog appear on google in the search results you need a sitemap xml which allows the search engines crawlers to easily find the content.</p>
+
+<p>Unfortunately buster out of the box does not generate the sitemaps so we need to add it to our script</p>
+
+<p>At the top under the buster generate command add the following snippet</p>
+
+<pre><code> # Copy sitemap files
+wget --convert-links --page-requisites --no-parent --directory-prefix static --no-host-directories --restrict-file-name=unix http://127.0.0.1:9050/sitemap.xsl  
+wget --convert-links --page-requisites --no-parent --directory-prefix static --no-host-directories --restrict-file-name=unix http://127.0.0.1:9050/sitemap.xml  
+wget --convert-links --page-requisites --no-parent --directory-prefix static --no-host-directories --restrict-file-name=unix http://localhost:9050/sitemap-pages.xml  
+wget --convert-links --page-requisites --no-parent --directory-prefix static --no-host-directories --restrict-file-name=unix http://localhost:9050/sitemap-posts.xml  
+wget --convert-links --page-requisites --no-parent --directory-prefix static --no-host-directories --restrict-file-name=unix http://localhost:9050/sitemap-authors.xml  
+wget --convert-links --page-requisites --no-parent --directory-prefix static --no-host-directories --restrict-file-name=unix http://localhost:9050/sitemap-tags.xml  
+</code></pre>
+
+<p>Now save and run the script.</p>
+
+<p>Next we need to tell google that our site is ours so that we can access stats and point it to our sitemaps.</p>
+
+<p>Head to googles <a href="https://www.google.com/webmasters/tools/home">web master tools</a> and click the add property button and insert your github page url.</p>
+
+<p>Next you should be prompted to verify ownership. They recommend to add in a html file to your site however if you go to the alternative tab you will find a meta tag which looks something like.</p>
+
+<p><code>&lt;meta name="google-site-verification" content="mV9dWaG3eoW-q9NUnP6Radwdw6R1_db0" /&gt;</code></p>
+
+<p>Copy this.</p>
+
+<p>Go to your static directory generated by buster and edit your index.html file and paste this tag to somewhere in head tags.</p>
+
+<p>Now run your scripts and deploy your changes to github.</p>
+
+<p>Go back to your google verify page and click verify and you should now be registered.</p>
+
+<p>To let google know about your sitemaps created before go to crawl on the left navigation bar and then sitemaps.</p>
+
+<p>Click add sitemap and enter in "/sitemap.xml" into the box. </p>
+
+<p>Now just wait for google to index your site. The google webmaster tools also allows you to check out the stats on your links to see how many people are coming to the site and how often you appear in the search rankings as well as what the users are searching for.</p>
+
+<p>Try out my new comment section below and hopefully it should work..</p>]]></content:encoded></item><item><title><![CDATA[Creating a free blog using github and ghost]]></title><description><![CDATA[<p>As this is the first blog post it seems fitting to talk about how to set up a free blog using github.</p>
 
 <h2 id="localsetup">Local Setup</h2>
 
