@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0" xmlns:media="http://search.yahoo.com/mrss/"><channel><title><![CDATA[Josh's Tech Blog]]></title><description><![CDATA[Experimenting with different techs]]></description><link>http://localhost:2368/</link><generator>Ghost 0.8</generator><lastBuildDate>Thu, 04 Aug 2016 10:26:32 GMT</lastBuildDate><atom:link href="http://localhost:2368/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Creating a free blog using github and ghost]]></title><description><![CDATA[<p>As this is the first blog post it seems fitting to talk about how to set up a free blog using github.</p>
+
+<h2 id="localsetup">Local Setup</h2>
+
+<p>In order to get started quickly I decided to run my local ghost server using docker.</p>
+
+<p>This can be downloaded and installed easily from <a href="https://www.docker.com/products/docker">https://www.</a></p>]]></description><link>http://localhost:2368/creating-a-free-blog-using-github-and-ghost/</link><guid isPermaLink="false">bc6be5c7-942a-49fb-9445-b33fba720698</guid><dc:creator><![CDATA[Joshua Head]]></dc:creator><pubDate>Mon, 01 Aug 2016 11:22:26 GMT</pubDate><content:encoded><![CDATA[<p>As this is the first blog post it seems fitting to talk about how to set up a free blog using github.</p>
+
+<h2 id="localsetup">Local Setup</h2>
+
+<p>In order to get started quickly I decided to run my local ghost server using docker.</p>
+
+<p>This can be downloaded and installed easily from <a href="https://www.docker.com/products/docker">https://www.docker.com/products/docker</a>. Just follow the instructions for your operating system.</p>
+
+<p>Once installed open up a command line/terminal and run <br>
+<code>docker pull ghost</code> <br>
+This will pull down the required dependencies to start your blog server</p>
+
+<p>The next step is to create and run a ghost container by using the following command. </p>
+
+<p><code>docker run --name blog-ghost -p 9050:2368 -v /Users/headly48/Documents/blog/ghost:/var/lib/ghost ghost</code></p>
+
+<ul>
+<li>This will start the blog server on port 9050. I personally had issues running on the default 2368 port so elected to set it manually</li>
+<li>Also make sure to change "/Users/headly48/Documents/blog/ghost" to your own directory where you would like to save all generated files</li>
+</ul>
+
+<p>Thats it! You can now see your blog at <a href="http://localhost:9050">http://localhost:9050</a>.</p>
+
+<p>Now that you have it running go to <a href="http://localhost:9050/ghost">http://localhost:9050/ghost</a> to make a local account. </p>
+
+<p>Once logged in check out the getting started post on how to use markdown. Alternatively I find daringfireball a good site to start with when learning markdown <br>
+<a href="https://daringfireball.net/projects/markdown/">https://daringfireball.net/projects/markdown/</a></p>
+
+<h2 id="pushingtogithub">Pushing to Github</h2>
+
+<p>In order for your site to display on github you will need to have/register a free account at <a href="https://github.com">github</a></p>
+
+<p>Once you have a account create a repository with the name <br>
+"accountname.github.io", where accountname is your user. In my case its "headly48.github.io"</p>
+
+<p>To appear on github pages correctly the blog needs to be in a static format.</p>
+
+<p>This is where <a href="https://pypi.python.org/pypi/buster/0.1">buster</a> comes in. To put simply buster converts the ghost blog from being driven by a database into a file structor</p>
+
+<p>To install buster we first require a few dependencies. Unfortunately mac and windows are slightly different so I have separated out the process for each below.</p>
+
+<h6 id="windows">Windows</h6>
+
+<p>For Windows users you are required to download pip. The instructions to install pip here <a href="https://github.com/BurntSushi/nfldb/wiki/Python-&amp;-pip-Windows-installation">here</a>. <br>
+Once installed you will also need wget which can be found <a href="http://gnuwin32.sourceforge.net/packages/wget.htm">here</a>.</p>
+
+<p>Once done run the command <code>pip install buster</code> in the command line</p>
+
+<h6 id="mac">Mac</h6>
+
+<p>For Mac its best to install the python using homebrew instead of using the preinstalled version. Instructions for installing brew it can be found <a href="http://brew.sh/">here</a></p>
+
+<p>Once brew is installed run the following command in the terminal to get the latest python <br>
+<code>brew install python</code></p>
+
+<p>Then run the following two commands in the terminal to finish it off <br>
+<code>brew install wget</code></p>
+
+<p><code>pip install buster</code></p>
+
+<hr>
+
+<p>Now that Buster has been installed cd in the terminal/command line to the directory that you would like to save your static content too</p>
+
+<p>In my case since i am using "/Users/headly48/Documents/blog/ghost" as my base for my ghost server I have gone to "cd /Users/headly48/Documents/blog"</p>
+
+<p>Run the command <br>
+<code>buster setup --gh-repo=https://github.com/username/username.github.io.git</code></p>
+
+<p>This will create a static folder linked to your git repo added earlier. Make sure you change username to your github ussername eg "buster setup --gh-repo=<a href="https://github.com/headly48/headly48.github.io.git">https://github.com/headly48/headly48.github.io.git</a>"</p>
+
+<p><strong>Please Note:</strong> Make sure you do <strong>Not</strong> do this in the same directory as your docker files. If you do you will be encouter chown permission issues when trying to restart your docker server later on..</p>
+
+<p>Run the command <code>buster generate --domain=http://127.0.0.1:9050</code> <br>
+This will go through your site and convert it to html/static files under the newly created static directory.</p>
+
+<p>Next run <code>buster preview</code> and navigate to <a href="http://localhost:9000/">http://localhost:9000/</a> in your browser to see how your site will appear once submitted to github.</p>
+
+<p>To deploy your changes now run <code>buster deploy</code> <br>
+This step will prompt you for your github username/password.</p>
+
+<p>Once finished check out your new blog located at <a href="https://username.github.io">https://username.github.io</a>. Again just replace your username eg "<a href="https://headly48.github.io">https://headly48.github.io</a>"</p>
+
+<p>If you check out some of the links on the page you may notice that they refer to localhost:2368.</p>
+
+<p>To fix this create a new file called buster-build-static.sh containing the following lines.</p>
+
+<p>#!/bin/bash</p>
+
+<p># Generate static files with buster
+buster generate --domain=<a href="http://127.0.0.1:9050">http://127.0.0.1:9050</a> </p>
+
+<p># Replace urls that were missed by buster
+find static/* -name robots.txt -type f -exec sed -i '' 's#<a href="http://localhost:2368#http://headly48.github.io#g">http://localhost:2368#http://headly48.github.io#g</a>' {} \; <br>
+find static/* -name <em>.xsl -type f -exec sed -i '' 's#<a href="http://localhost:2368#http://headly48.github.io#g">http://localhost:2368#http://headly48.github.io#g</a>' {} \; <br>
+find static/</em> -name <em>.xml -type f -exec sed -i '' 's#loc><a href="http://localhost:2368#loc">http://localhost:2368#loc</a>><a href="http://headly48.github.io#g">http://headly48.github.io#g</a>' {} \; <br>
+find static/</em> -name <em>.html -type f -exec sed -i '' 's#u=<a href="http://localhost:2368#u=http://headly48.github.io#g">http://localhost:2368#u=http://headly48.github.io#g</a>' {} \; <br>
+find static/</em> -name <em>.html -type f -exec sed -i '' 's#url=<a href="http://localhost:2368#url=http://headly48.github.io#g">http://localhost:2368#url=http://headly48.github.io#g</a>' {} \; <br>
+find static/</em> -name <em>.html -type f -exec sed -i '' 's#href="<a href="http://localhost:2368#href=">http://localhost:2368#href=</a>"<a href="http://headly48.github.io#g">http://headly48.github.io#g</a>' {} \; <br>
+find static/</em> -name <em>.html -type f -exec sed -i '' 's#src="<a href="http://localhost:2368#src=">http://localhost:2368#src=</a>"<a href="http://headly48.github.io#g">http://headly48.github.io#g</a>' {} \; <br>
+find static/</em> -name *.html -type f -exec sed -i '' 's#link><a href="http://localhost:2368#link">http://localhost:2368#link</a>><a href="http://headly48.github.io#g">http://headly48.github.io#g</a>' {} \; </p>
+
+<p>What this does is replace all localhost links with your correct domain. Make sure to go through the lines and change headly48 to your username. <br>
+So from now on whenever you wish to regenerate your content use the following command instead of buster generate</p>
+
+<p>Now run the command <code>sh buster-build-static.sh</code></p>
+
+<p>and finally <code>buster deploy</code> to update github with your changes.</p>
+
+<p>To shutdown your local ghost run <br>
+<code>docker stop blog-ghost</code></p>
+
+<p>And if you want to bring it back up again when you next want to make changes <br>
+<code>docker start blog-ghost</code></p>]]></content:encoded></item><item><title><![CDATA[First Blog Post - "Hello World"]]></title><description><![CDATA[<p>Just the typical hello world test</p>]]></description><link>http://localhost:2368/welcome-to-ghost/</link><guid isPermaLink="false">e88dd491-6d42-4ef5-9632-cfc4ffc54a22</guid><category><![CDATA[Getting Started]]></category><dc:creator><![CDATA[Joshua Head]]></dc:creator><pubDate>Thu, 28 Jul 2016 08:54:29 GMT</pubDate><content:encoded><![CDATA[<p>Just the typical hello world test</p>]]></content:encoded></item></channel></rss>
