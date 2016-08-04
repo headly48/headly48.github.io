@@ -21,13 +21,13 @@
     <meta property="og:type" content="article">
     <meta property="og:title" content="Creating a free blog using github and ghost">
     <meta property="og:description" content="As this is the first blog post it seems fitting to talk about how to set up a free blog using github. Local Setup In order to get started quickly I decided to run my local ghost server using docker. This can be downloaded and installed easily from https://www.">
-    <meta property="og:url" content="http://shavo007.github.io/creating-a-free-blog-using-github-and-ghost/">
+    <meta property="og:url" content="http://headly48.github.io/creating-a-free-blog-using-github-and-ghost/">
     <meta property="article:published_time" content="2016-08-01T11:22:26.049Z">
     <meta property="article:modified_time" content="2016-08-01T11:22:26.045Z">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Creating a free blog using github and ghost">
     <meta name="twitter:description" content="As this is the first blog post it seems fitting to talk about how to set up a free blog using github. Local Setup In order to get started quickly I decided to run my local ghost server using docker. This can be downloaded and installed easily from https://www.">
-    <meta name="twitter:url" content="http://shavo007.github.io/creating-a-free-blog-using-github-and-ghost/">
+    <meta name="twitter:url" content="http://headly48.github.io/creating-a-free-blog-using-github-and-ghost/">
     <meta name="twitter:label1" content="Written by">
     <meta name="twitter:data1" content="Joshua Head">
     
@@ -38,16 +38,16 @@
     "publisher": {
         "@type": "Organization",
         "name": "Josh&#x27;s Tech Blog",
-        "logo": "http://shavo007.github.io/ghost/img/ghosticon.jpg"
+        "logo": "http://headly48.github.io/ghost/img/ghosticon.jpg"
     },
     "author": {
         "@type": "Person",
         "name": "Joshua Head",
-        "url": "http://shavo007.github.io/author/joshua/",
+        "url": "http://headly48.github.io/author/joshua/",
         "sameAs": []
     },
     "headline": "Creating a free blog using github and ghost",
-    "url": "http://shavo007.github.io/creating-a-free-blog-using-github-and-ghost/",
+    "url": "http://headly48.github.io/creating-a-free-blog-using-github-and-ghost/",
     "datePublished": "2016-08-01T11:22:26.049Z",
     "dateModified": "2016-08-01T11:22:26.045Z",
     "description": "As this is the first blog post it seems fitting to talk about how to set up a free blog using github. Local Setup In order to get started quickly I decided to run my local ghost server using docker. This can be downloaded and installed easily from https://www."
@@ -178,7 +178,7 @@ This step will prompt you for your github username/password.</p>
 
 <p>Once finished check out your new blog located at <a href="https://username.github.io">https://username.github.io</a>. Again just replace your username eg "<a href="https://headly48.github.io">https://headly48.github.io</a>"</p>
 
-<p>If you check out some of the links on the page you may notice that they refer to shavo007.github.io.</p>
+<p>If you check out some of the links on the page you may notice that they refer to headly48.github.io.</p>
 
 <p>To fix this create a new file called buster-build-static.sh containing the following lines.</p>
 
@@ -188,14 +188,14 @@ This step will prompt you for your github username/password.</p>
 buster generate --domain=<a href="http://127.0.0.1:9050">http://127.0.0.1:9050</a> </p>
 
 <p># Replace urls that were missed by buster
-find static/* -name robots.txt -type f -exec sed -i '' 's#<a href="http://headly48.github.io#http://headly48.github.io#g">http://shavo007.github.io#http://headly48.github.io#g</a>' {} \; <br>
-find static/* -name <em>.xsl -type f -exec sed -i '' 's#<a href="http://headly48.github.io#http://headly48.github.io#g">http://shavo007.github.io#http://headly48.github.io#g</a>' {} \; <br>
-find static/</em> -name <em>.xml -type f -exec sed -i '' 's#loc&gt;<a href="http://headly48.github.io#loc">http://shavo007.github.io#loc</a>&gt;<a href="http://headly48.github.io#g">http://headly48.github.io#g</a>' {} \; <br>
-find static/</em> -name <em>.html -type f -exec sed -i '' 's#u=<a href="http://headly48.github.io#u=http://headly48.github.io#g">http://shavo007.github.io#u=http://headly48.github.io#g</a>' {} \; <br>
-find static/</em> -name <em>.html -type f -exec sed -i '' 's#url=<a href="http://headly48.github.io#url=http://headly48.github.io#g">http://shavo007.github.io#url=http://headly48.github.io#g</a>' {} \; <br>
-find static/</em> -name <em>.html -type f -exec sed -i '' 's#href="<a href="http://headly48.github.io#href=">http://shavo007.github.io#href=</a>"<a href="http://headly48.github.io#g">http://headly48.github.io#g</a>' {} \; <br>
-find static/</em> -name <em>.html -type f -exec sed -i '' 's#src="<a href="http://headly48.github.io#src=">http://shavo007.github.io#src=</a>"<a href="http://headly48.github.io#g">http://headly48.github.io#g</a>' {} \; <br>
-find static/</em> -name *.html -type f -exec sed -i '' 's#link&gt;<a href="http://headly48.github.io#link">http://shavo007.github.io#link</a>&gt;<a href="http://headly48.github.io#g">http://headly48.github.io#g</a>' {} \; </p>
+find static/* -name robots.txt -type f -exec sed -i '' 's#<a href="http://headly48.github.io#http://headly48.github.io#g">http://headly48.github.io#http://headly48.github.io#g</a>' {} \; <br>
+find static/* -name <em>.xsl -type f -exec sed -i '' 's#<a href="http://headly48.github.io#http://headly48.github.io#g">http://headly48.github.io#http://headly48.github.io#g</a>' {} \; <br>
+find static/</em> -name <em>.xml -type f -exec sed -i '' 's#loc&gt;<a href="http://headly48.github.io#loc">http://headly48.github.io#loc</a>&gt;<a href="http://headly48.github.io#g">http://headly48.github.io#g</a>' {} \; <br>
+find static/</em> -name <em>.html -type f -exec sed -i '' 's#u=<a href="http://headly48.github.io#u=http://headly48.github.io#g">http://headly48.github.io#u=http://headly48.github.io#g</a>' {} \; <br>
+find static/</em> -name <em>.html -type f -exec sed -i '' 's#url=<a href="http://headly48.github.io#url=http://headly48.github.io#g">http://headly48.github.io#url=http://headly48.github.io#g</a>' {} \; <br>
+find static/</em> -name <em>.html -type f -exec sed -i '' 's#href="<a href="http://headly48.github.io#href=">http://headly48.github.io#href=</a>"<a href="http://headly48.github.io#g">http://headly48.github.io#g</a>' {} \; <br>
+find static/</em> -name <em>.html -type f -exec sed -i '' 's#src="<a href="http://headly48.github.io#src=">http://headly48.github.io#src=</a>"<a href="http://headly48.github.io#g">http://headly48.github.io#g</a>' {} \; <br>
+find static/</em> -name *.html -type f -exec sed -i '' 's#link&gt;<a href="http://headly48.github.io#link">http://headly48.github.io#link</a>&gt;<a href="http://headly48.github.io#g">http://headly48.github.io#g</a>' {} \; </p>
 
 <p>What this does is replace all localhost links with your correct domain. Make sure to go through the lines and change headly48 to your username. <br>
 So from now on whenever you wish to regenerate your content use the following command instead of buster generate</p>
