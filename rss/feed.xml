@@ -1,4 +1,47 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0" xmlns:media="http://search.yahoo.com/mrss/"><channel><title><![CDATA[Josh's Tech Blog]]></title><description><![CDATA[Experimenting with different techs]]></description><link>http://localhost:2368/</link><generator>Ghost 0.8</generator><lastBuildDate>Thu, 04 Aug 2016 12:09:24 GMT</lastBuildDate><atom:link href="http://localhost:2368/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Creating a free blog using github and ghost. Part II]]></title><description><![CDATA[<p>In the last post I went through the steps on how to set up a blog using github pages. Which can be found <a href="https://headly48.github.io/creating-a-free-blog-using-github-and-ghost/">here</a></p>
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0" xmlns:media="http://search.yahoo.com/mrss/"><channel><title><![CDATA[Josh's Tech Blog]]></title><description><![CDATA[Experimenting with different techs]]></description><link>http://localhost:2368/</link><generator>Ghost 0.11</generator><lastBuildDate>Wed, 23 Nov 2016 21:48:21 GMT</lastBuildDate><atom:link href="http://localhost:2368/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[AWS - Setting up a free account]]></title><description><![CDATA[<p>For the last few years Amazon has offered a pretty substantial free tier for their cloud services and I thought what better time to sign up for a personal account.</p>
+
+<p>The list of services that Amazon offer is quite mind-boggling however the products and associated limits that come with the</p>]]></description><link>http://localhost:2368/aws-setting-up-a-free-account/</link><guid isPermaLink="false">f1706623-fed9-44e4-b2b9-d3b251bb52a4</guid><dc:creator><![CDATA[Joshua Head]]></dc:creator><pubDate>Wed, 23 Nov 2016 10:46:07 GMT</pubDate><content:encoded><![CDATA[<p>For the last few years Amazon has offered a pretty substantial free tier for their cloud services and I thought what better time to sign up for a personal account.</p>
+
+<p>The list of services that Amazon offer is quite mind-boggling however the products and associated limits that come with the free tier can be found <a href="https://aws.amazon.com/free/">here</a></p>
+
+<p>Below are the things that I am looking forward to trying out and the associated limits</p>
+
+<ul>
+<li><p><b>AWS Lambda</b> (1,000,000 executions per month)</p>
+
+<p>This is Amazon's serverless platform allowing you to easily run code without requiring a dedicated instance or server and links in nicely with some of their other offerings such as DynamoDB and S3. The code that is executed can be either Java, node.js and Python</p></li>
+<li><p><b>DynamoDB</b> (25 GB storage - 25Units read/write)</p>
+
+<p>Amazon's NoSQL database </p></li>
+<li><p><b>S3</b> (5GB storage - 20,000 Gets/ 2,000 Puts)</p>
+
+<p>Amazon's service for object storage which is hopefully easy to use and secure. It offers 3 different types of storage depending on how often you would like to access the data</p></li>
+<li><p><b>EC2</b> (1 x t2.micro instance)</p>
+
+<p>Amazon's virtual server hosting allows for the quick and easy setup of server instances </p></li>
+</ul>
+
+<h4 id="signingup">Signing up</h4>
+
+<p>Signing up was fairly straight forward and easy and can be started from <a href="https://www.amazon.com/ap/signin">here</a>. It looks like you can use your existing Amazon account if you already have one. <br>
+During the verification part of the flow they use an automated phone call to provide you a code which is slightly different and I haven't really seen before.</p>
+
+<h6 id="settingupmultifactorauthenticationmfa">Setting up multi-factor authentication (MFA)</h6>
+
+<p>Once logged in I wanted to secure my account and ensure that it's less likely someone will get access and be able to spin up hundreds of EC2 instances costing me a fortune.</p>
+
+<p>Fortunately they offer MFA and setup is done easily by going to the Identity and Access Management dashboard and selecting manage MFA</p>
+
+<p>Since I am using an Android phone I elected the virtual MFA device option. <br>
+Download the authenticate app which can be found on the google play store <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&amp;hl=en">here</a> </p>
+
+<p>Once downloaded simply scan the barcode and enter in 2 of the codes as they appear. Now next time you log in you'll be prompted to enter the code that appears in the app which changes every 30 seconds</p>
+
+<h6 id="settingupabillingalarm">Setting up a billing alarm</h6>
+
+<p>Since this AWS account is mainly for being used as a playpen and I am fairly cheap I elected to create a billing alert. This is so that I am notified when I exceed the free tier limits so I can scale back my usage.</p>
+
+<p>The docs on how to set this up can be found <a href="http://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/free-tier-alarms.html">here</a></p>]]></content:encoded></item><item><title><![CDATA[Creating a free blog using github and ghost. Part II]]></title><description><![CDATA[<p>In the last post I went through the steps on how to set up a blog using github pages. Which can be found <a href="https://headly48.github.io/creating-a-free-blog-using-github-and-ghost/">here</a></p>
 
 <p>In this post I'm going to continue with setting up my blog by adding a few more features.</p>
 
