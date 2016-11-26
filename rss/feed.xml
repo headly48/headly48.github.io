@@ -1,4 +1,74 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0" xmlns:media="http://search.yahoo.com/mrss/"><channel><title><![CDATA[Josh's Tech Blog]]></title><description><![CDATA[Experimenting with different techs]]></description><link>http://localhost:2368/</link><generator>Ghost 0.11</generator><lastBuildDate>Sat, 26 Nov 2016 09:27:06 GMT</lastBuildDate><atom:link href="http://localhost:2368/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[AWS - Creating my first lambda function]]></title><description><![CDATA[<p>Since creating my AWS account a few days ago i have been dying to try out there lambda functions and thought I should create a very simple rest endpoint that will return a lorem lipsum message.</p>
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0" xmlns:media="http://search.yahoo.com/mrss/"><channel><title><![CDATA[Josh's Tech Blog]]></title><description><![CDATA[Experimenting with different techs]]></description><link>http://localhost:2368/</link><generator>Ghost 0.11</generator><lastBuildDate>Sat, 26 Nov 2016 15:30:50 GMT</lastBuildDate><atom:link href="http://localhost:2368/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Severless - Making lambda deployments easy]]></title><description><![CDATA[<p>In my last post I worked on my first lambda function and went through the process of manually setting up the function, gateway and roles. While this works it does slow down development considerably and I can see it quickly becoming a pain in the arse especially when dealing with</p>]]></description><link>http://localhost:2368/severless-making-lambda-deployments-easy/</link><guid isPermaLink="false">2aae2cfb-2649-4438-b56b-e24081c8c92c</guid><dc:creator><![CDATA[Joshua Head]]></dc:creator><pubDate>Sat, 26 Nov 2016 15:22:10 GMT</pubDate><content:encoded><![CDATA[<p>In my last post I worked on my first lambda function and went through the process of manually setting up the function, gateway and roles. While this works it does slow down development considerably and I can see it quickly becoming a pain in the arse especially when dealing with different environment's when releasing changes.</p>
+
+<p>In comes <a href="https://serverless.com/">Serverless</a> which is a framework to help you develop and deploy serverless architectures in AWS. It's built on Node.js and currently only supports python and node runtime environment's however the others are in the works.</p>
+
+<p>It sounds fairly decent so thought I'd try it out by switching the lorem-lipsum function I created in my last <a href="https://headly48.github.io/aws-creating-my-first-lambda-function/">post</a> to use it.</p>
+
+<p>First up I installed the framework using npm following the instructions <a href="https://www.npmjs.com/package/serverless">here</a></p>
+
+<p>Once installed I created the serverless.yml file with the following settings</p>
+
+<pre><code>service: lorem-lipsum-serverless
+
+frameworkVersion: "=1.2.1"
+
+provider:  
+  name: aws
+  runtime: nodejs4.3
+  memorySize: 128 
+
+functions:  
+  getLoremIpsum:
+    handler: handler.getLoremIpsum
+    events:
+       - http:
+           path: lorem
+           method: get
+</code></pre>
+
+<p>With this file i'm creating the http endpoint '/lorem' which is mapped to the function getLoremIpsum which is below </p>
+
+<p><img src="http://localhost:2368/content/images/2016/11/firstCode.JPG" alt=""></p>
+
+<p>I'v now got the mappings and function but before I can deploy I need to create an AWS user that has all the permissions required to create and delete the stacks.</p>
+
+<p>I added the json that I used to create the 6 policy's that I have added to my user <a href="https://github.com/headly48/blog-samples/tree/master/lorem-lipsum-serverless/policys">here</a> once done I set my awscli to use the user I just created.</p>
+
+<p>I'v now got my mappings, the function and all the permissions I need so now time to deploy it!</p>
+
+<p>This is as easy as running the command <code>serverless deploy</code> <br>
+<img src="http://localhost:2368/content/images/2016/11/Deploying.JPG" alt=""></p>
+
+<p>And the result</p>
+
+<p><img src="http://localhost:2368/content/images/2016/11/firstResponse.JPG" alt=""></p>
+
+<p>Hmm but now I wanted to make a change to the function to return a different response. After making the code changes and re-running the command it has been updated</p>
+
+<p><img src="http://localhost:2368/content/images/2016/11/secondResponse.JPG" alt=""></p>
+
+<p>By default when running <code>serverless deploy</code> it stages it as dev so now that the response is all good I wish to deploy it to prod</p>
+
+<p><code>serverless deploy --stage prod</code></p>
+
+<p><img src="http://localhost:2368/content/images/2016/11/prod.JPG" alt=""></p>
+
+<p>I now have two different environments so that I can make code changes to dev and test them without effecting prod.</p>
+
+<p>After running <code>serverless deploy</code> again my dev env reflects the changes</p>
+
+<p><img src="http://localhost:2368/content/images/2016/11/devTextNew.JPG" alt=""></p>
+
+<p>While the prod env is still returning the same response as what I deployed earlier.</p>
+
+<p>Once finished It's just as easy to tear down and delete all traces of the stack by running the command <br>
+<code>serverless remove</code></p>
+
+<p><img src="http://localhost:2368/content/images/2016/11/removal.JPG" alt=""></p>
+
+<p>While this was a fairly simple and small test the serverless framework does appear to do the job in helping to deploy the stacks with different stages and i'll be using it in the future :D.</p>
+
+<p>The sample code can be found <a href="https://github.com/headly48/blog-samples/tree/master/lorem-lipsum-serverless">here</a></p>]]></content:encoded></item><item><title><![CDATA[AWS - Creating my first lambda function]]></title><description><![CDATA[<p>Since creating my AWS account a few days ago i have been dying to try out there lambda functions and thought I should create a very simple rest endpoint that will return a lorem lipsum message.</p>
 
 <h3 id="creatingthefunction">Creating the function</h3>
 
