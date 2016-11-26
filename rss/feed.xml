@@ -1,4 +1,53 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0" xmlns:media="http://search.yahoo.com/mrss/"><channel><title><![CDATA[Josh's Tech Blog]]></title><description><![CDATA[Experimenting with different techs]]></description><link>http://localhost:2368/</link><generator>Ghost 0.11</generator><lastBuildDate>Wed, 23 Nov 2016 21:48:21 GMT</lastBuildDate><atom:link href="http://localhost:2368/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[AWS - Setting up a free account]]></title><description><![CDATA[<p>For the last few years Amazon has offered a pretty substantial free tier for their cloud services and I thought what better time to sign up for a personal account.</p>
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0" xmlns:media="http://search.yahoo.com/mrss/"><channel><title><![CDATA[Josh's Tech Blog]]></title><description><![CDATA[Experimenting with different techs]]></description><link>http://localhost:2368/</link><generator>Ghost 0.11</generator><lastBuildDate>Sat, 26 Nov 2016 09:27:06 GMT</lastBuildDate><atom:link href="http://localhost:2368/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[AWS - Creating my first lambda function]]></title><description><![CDATA[<p>Since creating my AWS account a few days ago i have been dying to try out there lambda functions and thought I should create a very simple rest endpoint that will return a lorem lipsum message.</p>
+
+<h3 id="creatingthefunction">Creating the function</h3>
+
+<p>To get started I created a very basic index.js file</p>]]></description><link>http://localhost:2368/aws-creating-my-first-lambda-function/</link><guid isPermaLink="false">555f5d57-c4c2-4a95-9c2a-acd7e33c6aa5</guid><dc:creator><![CDATA[Joshua Head]]></dc:creator><pubDate>Sat, 26 Nov 2016 08:03:53 GMT</pubDate><content:encoded><![CDATA[<p>Since creating my AWS account a few days ago i have been dying to try out there lambda functions and thought I should create a very simple rest endpoint that will return a lorem lipsum message.</p>
+
+<h3 id="creatingthefunction">Creating the function</h3>
+
+<p>To get started I created a very basic index.js file in a new project with a function handler that will be called by aws.</p>
+
+<p><img src="http://localhost:2368/content/images/2016/11/index.JPG" alt=""></p>
+
+<p>To keep it simple I used the lorem-ipsum node module available <a href="https://www.npmjs.com/package/lorem-ipsum">here</a> which i pulled down using a package.json file and npm </p>
+
+<p><img src="http://localhost:2368/content/images/2016/11/package.JPG" alt=""></p>
+
+<p>I then created a zip folder containing the index.js file and also its dependencies in the node_modules subfolder.</p>
+
+<p>I did run into an issue when zipping these folders where it created a folder wrapping these files in the artifact and as such when uploading and testing in AWS I received errors saying the handler does not exist.</p>
+
+<h3 id="mappingthelambdafunction">Mapping the lambda function</h3>
+
+<p>Now that I had created the artifact it was time to login to the AWS console and go to the lambda <a href="https://console.aws.amazon.com/lambda/home?#/create/configure-function">dashboard</a> to create the lambda and map it to the function that I just created.</p>
+
+<p>Below is the configurations I  used when configuring the new lambda <br>
+<img src="http://localhost:2368/content/images/2016/11/CreateLambda.JPG" alt=""></p>
+
+<p>Once done you should be able to test it out and if all works out well see the response :D</p>
+
+<p><img src="http://localhost:2368/content/images/2016/11/Success.JPG" alt=""></p>
+
+<h3 id="creatingthegateway">Creating the gateway</h3>
+
+<p>Now that I had a function running I wanted to be able to trigger it and get the response using a rest call. This was setup by using the AWS <a href="https://console.aws.amazon.com/apigateway/home">gateway</a>.</p>
+
+<p>First up I created an api and then created a get method to the lambda created above <br>
+<img src="http://localhost:2368/content/images/2016/11/gateway.JPG" alt=""></p>
+
+<p>Once the method is created I tested it out within the gateway and all looks good <br>
+<img src="http://localhost:2368/content/images/2016/11/gatewaySuccess.JPG" alt=""></p>
+
+<p>The final step is to deploy the gateway API. At first I missed this step and was stuck wondering why I was receiving error's when trying to hit the same endpoint that was displayed when testing.</p>
+
+<p><img src="http://localhost:2368/content/images/2016/11/deployGateway.JPG" alt=""></p>
+
+<p>Once done I was able to successfully hit the endpoint using postman and see the generated Lipsum text.</p>
+
+<p>While I used the AWS console to manually configure the different components since it was my first time. Next time I would use their aws-cli and cloudformation to try and do it all automatically enabling quicker changes and updates to the function.</p>
+
+<p>The code can be found <a href="https://github.com/headly48/blog-samples/tree/master/lorem-lipsum-lambda">here</a></p>]]></content:encoded></item><item><title><![CDATA[AWS - Setting up a free account]]></title><description><![CDATA[<p>For the last few years Amazon has offered a pretty substantial free tier for their cloud services and I thought what better time to sign up for a personal account.</p>
 
 <p>The list of services that Amazon offer is quite mind-boggling however the products and associated limits that come with the</p>]]></description><link>http://localhost:2368/aws-setting-up-a-free-account/</link><guid isPermaLink="false">f1706623-fed9-44e4-b2b9-d3b251bb52a4</guid><dc:creator><![CDATA[Joshua Head]]></dc:creator><pubDate>Wed, 23 Nov 2016 10:46:07 GMT</pubDate><content:encoded><![CDATA[<p>For the last few years Amazon has offered a pretty substantial free tier for their cloud services and I thought what better time to sign up for a personal account.</p>
 
