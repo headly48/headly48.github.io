@@ -1,4 +1,371 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0" xmlns:media="http://search.yahoo.com/mrss/"><channel><title><![CDATA[Josh's Tech Blog]]></title><description><![CDATA[Experimenting with different techs]]></description><link>http://localhost:2368/</link><generator>Ghost 0.11</generator><lastBuildDate>Fri, 09 Dec 2016 11:03:32 GMT</lastBuildDate><atom:link href="http://localhost:2368/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Serverless - Making lambda deployments easy]]></title><description><![CDATA[<p>In my last post I worked on my first lambda function and went through the process of manually setting up the function, gateway and roles. While this works it does slow down development considerably and I can see it quickly becoming a pain in the arse especially when dealing with</p>]]></description><link>http://localhost:2368/severless-making-lambda-deployments-easy/</link><guid isPermaLink="false">2aae2cfb-2649-4438-b56b-e24081c8c92c</guid><category><![CDATA[AWS Lambda]]></category><category><![CDATA[Serverless]]></category><dc:creator><![CDATA[Joshua Head]]></dc:creator><pubDate>Sat, 26 Nov 2016 15:22:10 GMT</pubDate><content:encoded><![CDATA[<p>In my last post I worked on my first lambda function and went through the process of manually setting up the function, gateway and roles. While this works it does slow down development considerably and I can see it quickly becoming a pain in the arse especially when dealing with different environment's when releasing changes.</p>
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0" xmlns:media="http://search.yahoo.com/mrss/"><channel><title><![CDATA[Josh's Tech Blog]]></title><description><![CDATA[Experimenting with different techs]]></description><link>http://localhost:2368/</link><generator>Ghost 0.11</generator><lastBuildDate>Sat, 10 Dec 2016 10:54:30 GMT</lastBuildDate><atom:link href="http://localhost:2368/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Creating a CRUD API with AWS lambda and dynamoDB]]></title><description><![CDATA[<h6 id="intro">Intro</h6>
+
+<p>The last few lambda functions I have created have been very basic in nature as they returned simple responses with no error handling or other integrations needed.</p>
+
+<p>So I thought I should try creating a slightly more complex CRUD API that links to a dynamoDB table to store a</p>]]></description><link>http://localhost:2368/creating-a-crud-api-with-aws-lambda-and-dynamodb/</link><guid isPermaLink="false">9f320dae-d617-40f9-b0bd-4358f04fe5ff</guid><dc:creator><![CDATA[Joshua Head]]></dc:creator><pubDate>Sat, 10 Dec 2016 10:48:45 GMT</pubDate><content:encoded><![CDATA[<h6 id="intro">Intro</h6>
+
+<p>The last few lambda functions I have created have been very basic in nature as they returned simple responses with no error handling or other integrations needed.</p>
+
+<p>So I thought I should try creating a slightly more complex CRUD API that links to a dynamoDB table to store a users information and skills.</p>
+
+<p>To implement this I used the following:</p>
+
+<ul>
+<li><a href="https://serverless.com/">Serverless</a></li>
+<li>DynamoDb</li>
+<li>AWS Lambda</li>
+<li>Node 4.3.2</li>
+</ul>
+
+<h6 id="creatingthedynamodbtable">Creating the dynamoDB table</h6>
+
+<p>First up I needed to create a database for our api/functions to store the data in.</p>
+
+<p>To provision the dynamoDb table I added the following into my serverless.yml file. </p>
+
+<pre><code>resources:  
+  Resources:
+    usersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: user-skills-CRUD-usersTable-${opt:stage}
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    DynamoDBIamPolicy:
+          Type: AWS::IAM::Policy
+          DependsOn: usersTable
+          Properties:
+            PolicyName: lambda-dynamodb
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - dynamodb:GetItem
+                    - dynamodb:PutItem
+                    - dynamodb:ListTables
+                    - dynamodb:DeleteItem
+                    - dynamodb:Query
+                    - dynamodb:UpdateItem
+                  Resource: arn:aws:dynamodb:*:*:table/user-skills-CRUD*
+            Roles:
+              - Ref: IamRoleLambdaExecution
+</code></pre>
+
+<p>This will create a table with the name "user-skills-CRUD-usersTable-${opt:stage}" where the "opt:stage" variable is replaced with the stage that I am deploying too. This allowed me to have different tables for each of my different environments.</p>
+
+<p>The DynamoDBIamPolicy section is used by serverless to create a policy with the permissions defined and assigns it to the lambda functions. Without this the functions would not be able to access the table.</p>
+
+<p>I also define the key of the table to be the userId which is a string as it will be a GUID.</p>
+
+<h6 id="endpoints">Endpoints</h6>
+
+<p>Now that I have the database table setup and the permissions all ready to go it's now time to define the endpoints and the lambda functions that they will map to.</p>
+
+<p>As part of this API I wanted to implement the following endpoints: </p>
+
+<ul>
+<li>(POST) /users - Create a user </li>
+<li>(PUT) /users/{userId} - Update the users details</li>
+<li>(DELETE) /users/{userId} - Delete the user</li>
+<li>(GET) /users/{userId} - Read the users details </li>
+</ul>
+
+<p>To provision the endpoints in the gateway I added the following into my serverless.yml file  </p>
+
+<pre><code>functions:  
+  getUser:
+    handler: index.getUser
+    events:
+      - http:
+          path: users/{userId}
+          method: get
+    environment:
+      usersTableName: user-skills-CRUD-usersTable-${opt:stage}
+  deleteUser:
+    handler: index.deleteUser
+    events:
+      - http:
+          path: users/{userId}
+          method: delete
+    environment:
+      usersTableName: user-skills-CRUD-usersTable-${opt:stage}
+  createUser:
+    handler: index.createUser
+    events:
+      - http:
+          path: users
+          method: post
+    environment:
+      usersTableName: user-skills-CRUD-usersTable-${opt:stage}
+  updateUser:
+    handler: index.updateUser
+    events:
+      - http:
+          path: users/{userId}
+          method: put
+    environment:
+      usersTableName: user-skills-CRUD-usersTable-${opt:stage}
+</code></pre>
+
+<p>This will create the four endpoints and also inject the table name as an environment variable into the function. Unfortunately while serverless does offer a service wide environment variable I was unable to get this to work and was forced to repeat this in each individual function which makes it slightly less clean :(</p>
+
+<p>The variable "{userId}" in the paths will be added to the event object that is passed into the lambda function. So can be accessed like "event.pathParameters.userId"</p>
+
+<h6 id="functions">Functions</h6>
+
+<p>Now that everything is mapped it was time to actually start writing the code behind the functions.</p>
+
+<p>To get started I wanted to wire up the database for local development. Locally I ran dynamoDB using docker the container can be found <a href="https://hub.docker.com/r/deangiberson/aws-dynamodb-local/">here</a> </p>
+
+<pre><code>const AWS = require('aws-sdk');
+
+let dynamoDb;
+
+//Set dynamoDbEndpoint if it exists
+if (process.env.dynamoDbEndpoint) {  
+  console.log('*** Manually setting dynamoDb config');
+  dynamoDb = new AWS.DynamoDB({accessKeyId: 'headly48', secretAccessKey: '123', region: 'us-west-2', endpoint: new AWS.Endpoint(process.env.dynamoDbEndpoint)});
+} else {
+  dynamoDb = new AWS.DynamoDB();
+}
+</code></pre>
+
+<p>So in the index.js file I added the above code which creates a new dynamoDB with my local endpoint otherwise it defaults to using my AWS configured settings.</p>
+
+<p>So if I want to call the createUser function against my local DB I ran the following in the command line</p>
+
+<p><code>node -e 'process.env.dynamoDbEndpoint = "http://192.168.99.100:8000"; require("./index.js").createUser(}, null, function (blah, res) {console.log(res)})'</code></p>
+
+<p>Now that's sorted I created a userService class which is responsible for making the calls to the database. </p>
+
+<pre><code>class UserService {  
+  constructor (dynamoDb, tableName) {
+
+      this.dynamoDb = dynamoDb;
+      this.tableName = tableName;
+  }
+}
+</code></pre>
+
+<p>And initialized it in the index.js by passing in the dbConnection and tableName  </p>
+
+<pre><code>let userService = new UserService(dynamoDb, process.env.usersTableName);  
+</code></pre>
+
+<p><br></p>
+
+<p>Now I just needed to create the createUser function in my index.js.</p>
+
+<p>This function first validates the users email is present and then makes a call to the userService which returns a promise. If the user has been successfully saved then it will return the userId in the body with a httpStatus of 201 else returns a 500.</p>
+
+<pre><code>module.exports.createUser = (event, context, callback) =&gt; {
+
+  let requestBody = JSON.parse(event.body);
+
+  if(!requestBody.email) {
+    return callback(null, {statusCode: 400, body: JSON.stringify({error: 'Please provide users email'})});
+  }
+
+  userService.createUser(requestBody).then(function (user) {
+
+    callback(null, {statusCode: 201, body: JSON.stringify(user)});
+  }).catch(function (error) {
+    console.log('Error creating user. ' + error);
+    callback(error);
+  });
+};
+</code></pre>
+
+<p>Below is the createUser function in the userService. It generates a userId and creates the param to pass to dynamoDb and returns a promise.</p>
+
+<pre><code>  createUser(userDetails) {
+
+    let userId = uuidGenerator.v4();
+
+    var params = {
+        TableName: this.tableName,
+        Item: {
+          userId: { S: userId},
+          email: {S: userDetails.email}
+        }
+    };
+
+    if (userDetails.skills) {
+      params.Item.skills = {SS: userDetails.skills}
+    }
+
+    return this.dynamoDb.putItem(params).promise().then(function (data) {
+      console.log('Created user ' + userId);
+
+      return {userId: userId};
+    });
+  }
+</code></pre>
+
+<p>Next the getUser function in the index.js.</p>
+
+<pre><code>module.exports.getUser = (event, context, callback) =&gt; {
+
+  if (!event.pathParameters.userId || !uuidvalidator(event.pathParameters.userId)) {
+
+    return callback(null, {statusCode: 400, body: JSON.stringify({error: 'UserId is invalid'})});
+  }
+
+  userService.getUser(event.pathParameters.userId).then(function (data) {
+
+    if (!data || Object.keys(data).length === 0) {
+
+      callback(null, {statusCode: 404, body: {message: 'User does not exist'}});
+    } else {
+
+      callback(null, {statusCode: 200, body: JSON.stringify(data)});
+    }
+  }).catch(function (error) {
+
+    callback(JSON.stringify({error: error}));
+  });
+};
+</code></pre>
+
+<p>And the userService function it calls</p>
+
+<pre><code>  getUser (userId) {
+
+    var params = {
+        TableName: this.tableName,
+        Key: { // a map of attribute name to AttributeValue for all primary key attributes
+            userId: { S: userId}
+        },
+        AttributesToGet: [
+            'userId',
+            'email',
+            'skills'
+        ]
+    };
+    return this.dynamoDb.getItem(params).promise().then(function (data) {
+      let user = {};
+      user.userId = data.Item.userId.S;
+      user.skills = data.Item.skills.SS;
+
+      return user;
+    });
+  }
+</code></pre>
+
+<p>Next the updateUser function in the index.js</p>
+
+<pre><code>module.exports.updateUser = (event, context, callback) =&gt; {
+
+  if (!event.pathParameters.userId || !uuidvalidator(event.pathParameters.userId)) {
+
+    return callback(null, {statusCode: 400, body: JSON.stringify({error: 'UserId is invalid'})});
+  }
+
+  let requestBody = JSON.parse(event.body);
+
+  if(!requestBody.email) {
+    return callback(null, {statusCode: 400, body: JSON.stringify({error: 'Please provide users email'})});
+  }
+
+  userService.updateUser(event.pathParameters.userId, requestBody).then(function () {
+
+    callback(null, {statusCode: 204});
+  }).catch(function (error) {
+    console.log('Error creating user. ' + error);
+    callback(error);
+  });
+};
+</code></pre>
+
+<p>And the function in the userService</p>
+
+<pre><code>  updateUser (userId, userDetails) {
+
+    var params = {
+        TableName: this.tableName,
+        Key: { // a map of attribute name to AttributeValue for all primary key attributes
+          userId: { S: userId}
+        },
+        AttributeUpdates: {}
+    };
+
+    if (userDetails.email) {
+      params.AttributeUpdates.email = {
+        Action: 'PUT',
+        Value: {S: userDetails.email}
+      }
+    }
+
+    if (userDetails.skills) {
+      params.AttributeUpdates.skills = {
+        Action: 'PUT',
+        Value: {SS: userDetails.skills}
+      }
+    }
+
+    return this.dynamoDb.updateItem(params).promise();
+  }
+</code></pre>
+
+<p>Finally is the deleteUser function</p>
+
+<pre><code>module.exports.deleteUser = (event, context, callback) =&gt; {
+
+  let requestBody = JSON.parse(event.body);
+
+  if (!event.pathParameters.userId || !uuidvalidator(event.pathParameters.userId)) {
+
+    return callback(null, {statusCode: 400, body: JSON.stringify({error: 'UserId is invalid'})});
+  }
+
+  userService.deleteUser(event.pathParameters.userId).then(function () {
+
+    callback(null, {statusCode: 204});
+  }).catch(function (error) {
+    console.log('Error creating user. ' + error);
+    callback(error);
+  });
+};
+</code></pre>
+
+<p>And the function in the userService  </p>
+
+<pre><code>  deleteUser(userId) {
+
+    var params = {
+        TableName: this.tableName,
+        Key: {
+          userId: { S: userId}
+        }
+    };
+
+    return this.dynamoDb.deleteItem(params).promise();
+  }
+</code></pre>
+
+<h6 id="deploying">Deploying</h6>
+
+<p>Now for the fun part :D. <br>
+Deploying to AWS which is as simple as running the command <code>serverless deploy --stage dev</code>. </p>
+
+<p><img src="http://localhost:2368/content/images/2016/12/Deploy.JPG" alt=""></p>
+
+<p>As I have used the stage var in the serverless.yml file I now have to include the stage manually which is a little annoying and it would be nice if serverless picked up the default opts.</p>
+
+<h6 id="summary">Summary</h6>
+
+<p>It seemed fairly straightforward to get everything connected and working. It did take some time to workout the permissions that needed to be set and also setting environment variables/tableName was very fiddly and so ended up keeping it simple rather then constantly redeploying to see if changes to the service wide env variables fixed the issue of not being picked up correctly.</p>
+
+<p>The postman collection to test the endpoints can be found <a href="https://www.getpostman.com/collections/34d0ceaf9a0b6d66922b">here</a> <br>
+To see the full code and more commands to run locally checkout my <a href="https://github.com/headly48/blog-samples/tree/master/user-skills-CRUD">Github</a></p>]]></content:encoded></item><item><title><![CDATA[Serverless - Making lambda deployments easy]]></title><description><![CDATA[<p>In my last post I worked on my first lambda function and went through the process of manually setting up the function, gateway and roles. While this works it does slow down development considerably and I can see it quickly becoming a pain in the arse especially when dealing with</p>]]></description><link>http://localhost:2368/severless-making-lambda-deployments-easy/</link><guid isPermaLink="false">2aae2cfb-2649-4438-b56b-e24081c8c92c</guid><category><![CDATA[AWS Lambda]]></category><category><![CDATA[Serverless]]></category><dc:creator><![CDATA[Joshua Head]]></dc:creator><pubDate>Sat, 26 Nov 2016 15:22:10 GMT</pubDate><content:encoded><![CDATA[<p>In my last post I worked on my first lambda function and went through the process of manually setting up the function, gateway and roles. While this works it does slow down development considerably and I can see it quickly becoming a pain in the arse especially when dealing with different environment's when releasing changes.</p>
 
 <p>In comes <a href="https://serverless.com/">Serverless</a> which is a framework to help you develop and deploy serverless architectures in AWS. It's built on Node.js and currently only supports python and node runtime environment's however the others are in the works.</p>
 
