@@ -8,6 +8,21 @@
     
       
       <item>
+        <title>Using Windows10 for development - WLS</title>
+        
+          <description>&lt;p&gt;Once upon a time I use to develop using a windows machine..&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Wed, 26 Jul 2017 10:00:00 +1000</pubDate>
+        <link>
+        http://localhost:4000/developing-on-windows</link>
+        <guid isPermaLink="true">http://localhost:4000/developing-on-windows</guid>
+      </item>
+      
+    
+      
+      <item>
         <title>Creating a CRUD API with AWS lambda and dynamoDB</title>
         
           <description>&lt;h2 id=&quot;intro&quot;&gt;Intro&lt;/h2&gt;

@@ -1,4 +1,74 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2018-07-25T22:57:19+10:00</updated><id>http://localhost:4000/</id><title type="html">Headly’s blog of things</title><subtitle>A blog mostly about techie things</subtitle><entry><title type="html">Creating a CRUD API with AWS lambda and dynamoDB</title><link href="http://localhost:4000/aws-serverless-crud" rel="alternate" type="text/html" title="Creating a CRUD API with AWS lambda and dynamoDB" /><published>2017-07-25T22:00:00+10:00</published><updated>2017-07-25T22:00:00+10:00</updated><id>http://localhost:4000/aws-serverless-crud</id><content type="html" xml:base="http://localhost:4000/aws-serverless-crud">&lt;h2 id=&quot;intro&quot;&gt;Intro&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2018-07-26T00:50:18+10:00</updated><id>http://localhost:4000/</id><title type="html">Headly’s blog of things</title><subtitle>A blog mostly about techie things</subtitle><entry><title type="html">Using Windows10 for development - WLS</title><link href="http://localhost:4000/developing-on-windows" rel="alternate" type="text/html" title="Using Windows10 for development - WLS" /><published>2017-07-26T10:00:00+10:00</published><updated>2017-07-26T10:00:00+10:00</updated><id>http://localhost:4000/developing-on-windows</id><content type="html" xml:base="http://localhost:4000/developing-on-windows">&lt;p&gt;Once upon a time I use to develop using a windows machine..&lt;/p&gt;
+
+&lt;p&gt;After encountering many annoying issues when trying to setup my local dev environment sometimes taking days attempting to resolve proxy and issues with NPM packages that weren’t designed or tested on windows.&lt;/p&gt;
+
+&lt;p&gt;I then moved to the darkside after seeing a coworker join the team and within minutes have his environment setup and running.. on a Mac..&lt;/p&gt;
+
+&lt;p&gt;Since then I have been using Ubuntu/Mac operating systems&lt;/p&gt;
+
+&lt;p&gt;Recently I rebuilt my home desktop and so also upgraded my old windows duel boot windows7/Ubuntu combo to windows10/Ubuntu and since then have hardly booted into ubuntu&lt;/p&gt;
+
+&lt;p&gt;The reason?&lt;/p&gt;
+
+&lt;p&gt;Windows subsystem for Linux - WLS&lt;/p&gt;
+
+&lt;p&gt;This layer allows the running of binary executables natively meaning that you can run a Linux distro.&lt;/p&gt;
+
+&lt;h2 id=&quot;installingenabling-wsl&quot;&gt;Installing/Enabling WSL&lt;/h2&gt;
+&lt;p&gt;To enable WSL go to&lt;br /&gt;
+&lt;code class=&quot;highlighter-rouge&quot;&gt;Control Panel &amp;gt; Programs &amp;gt; Turn Windows features on or off&lt;/code&gt;
+Then enable tick “Windows Subsystem for Linux”&lt;/p&gt;
+
+&lt;p&gt;You then get prompted to restart, once your back up and running head over to the windows store and install the ubuntu “App” &lt;a href=&quot;https://www.microsoft.com/en-au/p/ubuntu/9nblggh4msv6&quot;&gt;Ubuntu&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Once installed perform a windows search for “Ubuntu” and select the app
+A terminal will open and your now in a ubuntu bash shell!&lt;/p&gt;
+
+&lt;h3 id=&quot;configure&quot;&gt;Configure&lt;/h3&gt;
+&lt;p&gt;Now that bash is installed you have to get the most out of it&lt;/p&gt;
+
+&lt;h4 id=&quot;installing-zsh&quot;&gt;Installing &lt;a href=&quot;https://en.wikipedia.org/wiki/Z_shell&quot;&gt;Zsh&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;Zsh has a crap ton of nice features ontop of the default bash shell&lt;/p&gt;
+
+&lt;p&gt;In the bash command line run
+&lt;code class=&quot;highlighter-rouge&quot;&gt;sudo apt-get install zsh&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;This installs the Z_shell. In order to default to zsh on load edit the users &lt;code class=&quot;highlighter-rouge&quot;&gt;~/.bashrc&lt;/code&gt; file and add the following lines&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;if test -t 1; then
+  exec zsh
+fi
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h4 id=&quot;installing-oh-my-zsh&quot;&gt;Installing &lt;a href=&quot;https://github.com/robbyrussell/oh-my-zsh&quot;&gt;Oh-My-Zsh&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;In order to make the most of zsh you want to use &lt;a href=&quot;https://github.com/robbyrussell/oh-my-zsh&quot;&gt;Oh-My-Zsh&lt;/a&gt; which is a framework to help manage and install plugins/themes for zsh&lt;/p&gt;
+
+&lt;p&gt;To install run
+&lt;code class=&quot;highlighter-rouge&quot;&gt;sh -c &quot;$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)&quot;&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Once installed check out the &lt;a href=&quot;https://github.com/robbyrussell/oh-my-zsh/wiki&quot;&gt;wiki&lt;/a&gt; to see the available themes and plugins.&lt;/p&gt;
+
+&lt;p&gt;One plugin I like is &lt;a href=&quot;https://github.com/zsh-users/zsh-autosuggestions&quot;&gt;autosuggestion&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Using your previous history it suggests possible commands that you may want to run as you type&lt;/p&gt;
+
+&lt;h4 id=&quot;installing-cmder-and-configure-to-use-base&quot;&gt;Installing &lt;a href=&quot;https://github.com/cmderdev/cmder&quot;&gt;cmder&lt;/a&gt; and configure to use base&lt;/h4&gt;
+&lt;p&gt;Cmder is console emulator because well the default windows one is.. crap&lt;/p&gt;
+
+&lt;p&gt;Download the latest &lt;a href=&quot;https://github.com/cmderdev/cmder/releases/&quot;&gt;release&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Press Win + Alt + T to open the tasks menu
+Create a new task clicking +&lt;/p&gt;
+
+&lt;p&gt;Give it the name “bash::ubuntu”
+Give it an icon “/icon %USERPROFILE%\software\cmder\os_ubuntu_alt.ico” changing the path to whatever image you want&lt;/p&gt;
+
+&lt;p&gt;And set the command to run to be &lt;code class=&quot;highlighter-rouge&quot;&gt;%windir%\system32\bash.exe ~ -cur_console:p&lt;/code&gt;
+Save and press ctrl + t and select your new task&lt;/p&gt;
+
+&lt;p&gt;It will now be running the zsh shell.&lt;/p&gt;
+
+&lt;p&gt;So far I have only used it lightly however so far it seem’s to be doing the job but only time will tell&lt;/p&gt;</content><author><name>Joshua</name></author><category term="Windows" /><summary type="html">Once upon a time I use to develop using a windows machine..</summary></entry><entry><title type="html">Creating a CRUD API with AWS lambda and dynamoDB</title><link href="http://localhost:4000/aws-serverless-crud" rel="alternate" type="text/html" title="Creating a CRUD API with AWS lambda and dynamoDB" /><published>2017-07-25T22:00:00+10:00</published><updated>2017-07-25T22:00:00+10:00</updated><id>http://localhost:4000/aws-serverless-crud</id><content type="html" xml:base="http://localhost:4000/aws-serverless-crud">&lt;h2 id=&quot;intro&quot;&gt;Intro&lt;/h2&gt;
 
 &lt;p&gt;The last few lambda functions I have created have been very basic in nature as they returned simple responses with no error handling or other integrations needed.&lt;/p&gt;
 
