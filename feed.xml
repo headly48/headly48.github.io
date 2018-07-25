@@ -1,0 +1,497 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2018-07-25T22:57:19+10:00</updated><id>http://localhost:4000/</id><title type="html">Headly’s blog of things</title><subtitle>A blog mostly about techie things</subtitle><entry><title type="html">Creating a CRUD API with AWS lambda and dynamoDB</title><link href="http://localhost:4000/aws-serverless-crud" rel="alternate" type="text/html" title="Creating a CRUD API with AWS lambda and dynamoDB" /><published>2017-07-25T22:00:00+10:00</published><updated>2017-07-25T22:00:00+10:00</updated><id>http://localhost:4000/aws-serverless-crud</id><content type="html" xml:base="http://localhost:4000/aws-serverless-crud">&lt;h2 id=&quot;intro&quot;&gt;Intro&lt;/h2&gt;
+
+&lt;p&gt;The last few lambda functions I have created have been very basic in nature as they returned simple responses with no error handling or other integrations needed.&lt;/p&gt;
+
+&lt;p&gt;So I thought I should try creating a slightly more complex CRUD API that links to a dynamoDB table to store a users information and skills.&lt;/p&gt;
+
+&lt;p&gt;To implement this I used the following:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://serverless.com/&quot;&gt;Serverless&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;DynamoDb&lt;/li&gt;
+  &lt;li&gt;AWS Lambda&lt;/li&gt;
+  &lt;li&gt;Node 4.3.2&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;creating-the-dynamodb-table&quot;&gt;Creating the dynamoDB table&lt;/h2&gt;
+&lt;p&gt;First up I needed to create a database for our api/functions to store the data in.&lt;/p&gt;
+
+&lt;p&gt;To provision the dynamoDb table I added the following into my serverless.yml file.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;resources:  
+  Resources:
+    usersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: user-skills-CRUD-usersTable-${opt:stage}
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    DynamoDBIamPolicy:
+          Type: AWS::IAM::Policy
+          DependsOn: usersTable
+          Properties:
+            PolicyName: lambda-dynamodb
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - dynamodb:GetItem
+                    - dynamodb:PutItem
+                    - dynamodb:ListTables
+                    - dynamodb:DeleteItem
+                    - dynamodb:Query
+                    - dynamodb:UpdateItem
+                  Resource: arn:aws:dynamodb:*:*:table/user-skills-CRUD*
+            Roles:
+              - Ref: IamRoleLambdaExecution
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;This will create a table with the name “user-skills-CRUD-usersTable-${opt:stage}” where the “opt:stage” variable is replaced with the stage that I am deploying too. This allowed me to have different tables for each of my different environments.&lt;/p&gt;
+
+&lt;p&gt;The DynamoDBIamPolicy section is used by serverless to create a policy with the permissions defined and assigns it to the lambda functions. Without this the functions would not be able to access the table.&lt;/p&gt;
+
+&lt;p&gt;I also define the key of the table to be the userId which is a string as it will be a GUID.&lt;/p&gt;
+
+&lt;h2 id=&quot;endpoints&quot;&gt;Endpoints&lt;/h2&gt;
+&lt;p&gt;Now that I have the database table setup and the permissions all ready to go it’s now time to define the endpoints and the lambda functions that they will map to.&lt;/p&gt;
+
+&lt;p&gt;As part of this API I wanted to implement the following endpoints:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;(POST) /users - Create a user&lt;/li&gt;
+  &lt;li&gt;(PUT) /users/{userId} - Update the users details&lt;/li&gt;
+  &lt;li&gt;(DELETE) /users/{userId} - Delete the user&lt;/li&gt;
+  &lt;li&gt;(GET) /users/{userId} - Read the users details&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;To provision the endpoints in the gateway I added the following into my serverless.yml file&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;functions:  
+  getUser:
+    handler: index.getUser
+    events:
+      - http:
+          path: users/{userId}
+          method: get
+    environment:
+      usersTableName: user-skills-CRUD-usersTable-${opt:stage}
+  deleteUser:
+    handler: index.deleteUser
+    events:
+      - http:
+          path: users/{userId}
+          method: delete
+    environment:
+      usersTableName: user-skills-CRUD-usersTable-${opt:stage}
+  createUser:
+    handler: index.createUser
+    events:
+      - http:
+          path: users
+          method: post
+    environment:
+      usersTableName: user-skills-CRUD-usersTable-${opt:stage}
+  updateUser:
+    handler: index.updateUser
+    events:
+      - http:
+          path: users/{userId}
+          method: put
+    environment:
+      usersTableName: user-skills-CRUD-usersTable-${opt:stage}
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;This will create the four endpoints and also inject the table name as an environment variable into the function. Unfortunately while serverless does offer a service wide environment variable I was unable to get this to work and was forced to repeat this in each individual function which makes it slightly less clean :(&lt;/p&gt;
+
+&lt;p&gt;The variable “{userId}” in the paths will be added to the event object that is passed into the lambda function. So can be accessed like “event.pathParameters.userId”&lt;/p&gt;
+
+&lt;h2 id=&quot;functions&quot;&gt;Functions&lt;/h2&gt;
+&lt;p&gt;Now that everything is mapped it was time to actually start writing the code behind the functions.&lt;/p&gt;
+
+&lt;p&gt;To get started I wanted to wire up the database for local development. Locally I ran dynamoDB using docker the container can be found &lt;a href=&quot;https://hub.docker.com/r/deangiberson/aws-dynamodb-local/&quot;&gt;here&lt;/a&gt;&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;const AWS = require('aws-sdk');
+
+let dynamoDb;
+
+//Set dynamoDbEndpoint if it exists
+if (process.env.dynamoDbEndpoint) {  
+  console.log('*** Manually setting dynamoDb config');
+  dynamoDb = new AWS.DynamoDB({accessKeyId: 'headly48', secretAccessKey: '123', region: 'us-west-2', endpoint: new AWS.Endpoint(process.env.dynamoDbEndpoint)});
+} else {
+  dynamoDb = new AWS.DynamoDB();
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;So in the index.js file I added the above code which creates a new dynamoDB with my local endpoint otherwise it defaults to using my AWS configured settings.&lt;/p&gt;
+
+&lt;p&gt;So if I want to call the createUser function against my local DB I ran the following in the command line&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;node -e 'process.env.dynamoDbEndpoint = &quot;http://192.168.99.100:8000&quot;; require(&quot;./index.js&quot;).createUser(}, null, function (blah, res) {console.log(res)})'&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Now that’s sorted I created a userService class which is responsible for making the calls to the database.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;class UserService {  
+  constructor (dynamoDb, tableName) {
+
+      this.dynamoDb = dynamoDb;
+      this.tableName = tableName;
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;And initialized it in the index.js by passing in the dbConnection and tableName&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;let userService = new UserService(dynamoDb, process.env.usersTableName);  
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Now I just needed to create the createUser function in my index.js.&lt;/p&gt;
+
+&lt;p&gt;This function first validates the users email is present and then makes a call to the userService which returns a promise. If the user has been successfully saved then it will return the userId in the body with a httpStatus of 201 else returns a 500.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;module.exports.createUser = (event, context, callback) =&amp;gt; {
+
+  let requestBody = JSON.parse(event.body);
+
+  if(!requestBody.email) {
+    return callback(null, {statusCode: 400, body: JSON.stringify({error: 'Please provide users email'})});
+  }
+
+  userService.createUser(requestBody).then(function (user) {
+
+    callback(null, {statusCode: 201, body: JSON.stringify(user)});
+  }).catch(function (error) {
+    console.log('Error creating user. ' + error);
+    callback(error);
+  });
+};
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Below is the createUser function in the userService. It generates a userId and creates the param to pass to dynamoDb and returns a promise.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;createUser(userDetails) {
+
+    let userId = uuidGenerator.v4();
+
+    var params = {
+        TableName: this.tableName,
+        Item: {
+          userId: { S: userId},
+          email: {S: userDetails.email}
+        }
+    };
+
+    if (userDetails.skills) {
+      params.Item.skills = {SS: userDetails.skills}
+    }
+
+    return this.dynamoDb.putItem(params).promise().then(function (data) {
+      console.log('Created user ' + userId);
+
+      return {userId: userId};
+    });
+  }
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Next the getUser function in the index.js.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;module.exports.getUser = (event, context, callback) =&amp;gt; {
+
+  if (!event.pathParameters.userId || !uuidvalidator(event.pathParameters.userId)) {
+
+    return callback(null, {statusCode: 400, body: JSON.stringify({error: 'UserId is invalid'})});
+  }
+
+  userService.getUser(event.pathParameters.userId).then(function (data) {
+
+    if (!data || Object.keys(data).length === 0) {
+
+      callback(null, {statusCode: 404, body: {message: 'User does not exist'}});
+    } else {
+
+      callback(null, {statusCode: 200, body: JSON.stringify(data)});
+    }
+  }).catch(function (error) {
+
+    callback(JSON.stringify({error: error}));
+  });
+};
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;And the userService function it calls&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;getUser (userId) {
+
+    var params = {
+        TableName: this.tableName,
+        Key: { // a map of attribute name to AttributeValue for all primary key attributes
+            userId: { S: userId}
+        },
+        AttributesToGet: [
+            'userId',
+            'email',
+            'skills'
+        ]
+    };
+    return this.dynamoDb.getItem(params).promise().then(function (data) {
+      let user = {};
+      user.userId = data.Item.userId.S;
+      user.skills = data.Item.skills.SS;
+
+      return user;
+    });
+  }
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Next the updateUser function in the index.js&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;module.exports.updateUser = (event, context, callback) =&amp;gt; {
+
+  if (!event.pathParameters.userId || !uuidvalidator(event.pathParameters.userId)) {
+
+    return callback(null, {statusCode: 400, body: JSON.stringify({error: 'UserId is invalid'})});
+  }
+
+  let requestBody = JSON.parse(event.body);
+
+  if(!requestBody.email) {
+    return callback(null, {statusCode: 400, body: JSON.stringify({error: 'Please provide users email'})});
+  }
+
+  userService.updateUser(event.pathParameters.userId, requestBody).then(function () {
+
+    callback(null, {statusCode: 204});
+  }).catch(function (error) {
+    console.log('Error creating user. ' + error);
+    callback(error);
+  });
+};
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;And the function in the userService&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;updateUser (userId, userDetails) {
+
+  var params = {
+      TableName: this.tableName,
+      Key: { // a map of attribute name to AttributeValue for all primary key attributes
+        userId: { S: userId}
+      },
+      AttributeUpdates: {}
+  };
+
+  if (userDetails.email) {
+    params.AttributeUpdates.email = {
+      Action: 'PUT',
+      Value: {S: userDetails.email}
+    }
+  }
+
+  if (userDetails.skills) {
+    params.AttributeUpdates.skills = {
+      Action: 'PUT',
+      Value: {SS: userDetails.skills}
+    }
+  }
+
+  return this.dynamoDb.updateItem(params).promise();
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Finally is the deleteUser function&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;module.exports.deleteUser = (event, context, callback) =&amp;gt; {
+
+  let requestBody = JSON.parse(event.body);
+
+  if (!event.pathParameters.userId || !uuidvalidator(event.pathParameters.userId)) {
+
+    return callback(null, {statusCode: 400, body: JSON.stringify({error: 'UserId is invalid'})});
+  }
+
+  userService.deleteUser(event.pathParameters.userId).then(function () {
+
+    callback(null, {statusCode: 204});
+  }).catch(function (error) {
+    console.log('Error creating user. ' + error);
+    callback(error);
+  });
+};
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;And the function in the userService&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;deleteUser(userId) {
+
+  var params = {
+      TableName: this.tableName,
+      Key: {
+        userId: { S: userId}
+      }
+  };
+
+  return this.dynamoDb.deleteItem(params).promise();
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;deploying&quot;&gt;Deploying&lt;/h2&gt;
+
+&lt;p&gt;Now for the fun part :D.
+Deploying to AWS which is as simple as running the command&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;serverless deploy --stage dev&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;assets/posts/2018-07-25-aws-serverless-crud/1.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;As I have used the stage var in the serverless.yml file I now have to include the stage manually which is a little annoying and it would be nice if serverless picked up the default opts.&lt;/p&gt;
+
+&lt;h2 id=&quot;summary&quot;&gt;Summary&lt;/h2&gt;
+
+&lt;p&gt;It seemed fairly straightforward to get everything connected and working. It did take some time to workout the permissions that needed to be set and also setting environment variables/tableName was very fiddly and so ended up keeping it simple rather then constantly redeploying to see if changes to the service wide env variables fixed the issue of not being picked up correctly.&lt;/p&gt;
+
+&lt;p&gt;The postman collection to test the endpoints can be found &lt;a href=&quot;https://www.getpostman.com/collections/34d0ceaf9a0b6d66922b&quot;&gt;here&lt;/a&gt;
+To see the full code and more commands to run locally checkout my &lt;a href=&quot;https://github.com/headly48/blog-samples/tree/master/user-skills-CRUD&quot;&gt;Github&lt;/a&gt;&lt;/p&gt;</content><author><name>Joshua</name></author><category term="AWS" /><category term="dynamoDB" /><category term="lambda" /><summary type="html">Intro</summary></entry><entry><title type="html">Serverless - Making lambda deployments easy</title><link href="http://localhost:4000/aws-serverless-deployments" rel="alternate" type="text/html" title="Serverless - Making lambda deployments easy" /><published>2017-07-25T21:00:00+10:00</published><updated>2017-07-25T21:00:00+10:00</updated><id>http://localhost:4000/aws-serverless-deployments</id><content type="html" xml:base="http://localhost:4000/aws-serverless-deployments">&lt;p&gt;In my last post I worked on my first lambda function and went through the process of manually setting up the function, gateway and roles. While this works it does slow down development considerably and I can see it quickly becoming a pain in the arse especially when dealing with different environment’s when releasing changes.&lt;/p&gt;
+
+&lt;p&gt;In comes &lt;a href=&quot;https://serverless.com/&quot;&gt;Serverless&lt;/a&gt; which is a framework to help you develop and deploy serverless architectures in AWS. It’s built on Node.js and currently only supports python and node runtime environment’s however the others are in the works.&lt;/p&gt;
+
+&lt;p&gt;It sounds fairly decent so thought I’d try it out by switching the lorem-lipsum function I created in my last post to use it.&lt;/p&gt;
+
+&lt;p&gt;First up I installed the framework using npm following the instructions &lt;a href=&quot;https://www.npmjs.com/package/serverless&quot;&gt;here&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Once installed I created the serverless.yml file with the following settings&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;service: lorem-lipsum-serverless
+
+frameworkVersion: &quot;=1.2.1&quot;
+
+provider:  
+  name: aws
+  runtime: nodejs4.3
+  memorySize: 128
+
+functions:  
+  getLoremIpsum:
+    handler: handler.getLoremIpsum
+    events:
+       - http:
+           path: lorem
+           method: get
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;With this file i’m creating the http endpoint ‘/lorem’ which is mapped to the function getLoremIpsum which is below&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;assets/posts/2018-07-25-aws-serverless-deployments/1.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;I’v now got the mappings and function but before I can deploy I need to create an AWS user that has all the permissions required to create and delete the stacks.&lt;/p&gt;
+
+&lt;p&gt;I added the json that I used to create the 6 policy’s that I have added to my user &lt;a href=&quot;https://github.com/headly48/blog-samples/tree/master/lorem-lipsum-serverless/policys&quot;&gt;here&lt;/a&gt; once done I set my awscli to use the user I just created.&lt;/p&gt;
+
+&lt;p&gt;I’v now got my mappings, the function and all the permissions I need so now time to deploy it!&lt;/p&gt;
+
+&lt;p&gt;This is as easy as running the command &lt;code class=&quot;highlighter-rouge&quot;&gt;serverless deploy&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;assets/posts/2018-07-25-aws-serverless-deployments/2.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;And the result&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;assets/posts/2018-07-25-aws-serverless-deployments/3.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Hmm but now I wanted to make a change to the function to return a different response. After making the code changes and re-running the command it has been updated&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;assets/posts/2018-07-25-aws-serverless-deployments/4.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;By default when running &lt;code class=&quot;highlighter-rouge&quot;&gt;serverless deploy&lt;/code&gt; it stages it as dev so now that the response is all good I wish to deploy it to prod&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;serverless deploy --stage prod&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;assets/posts/2018-07-25-aws-serverless-deployments/5.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;I now have two different environments so that I can make code changes to dev and test them without effecting prod.&lt;/p&gt;
+
+&lt;p&gt;After running &lt;code class=&quot;highlighter-rouge&quot;&gt;serverless deploy&lt;/code&gt; again my dev env reflects the changes&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;assets/posts/2018-07-25-aws-serverless-deployments/6.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;While the prod env is still returning the same response as what I deployed earlier.&lt;/p&gt;
+
+&lt;p&gt;Once finished It’s just as easy to tear down and delete all traces of the stack by running the command&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;serverless remove&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;assets/posts/2018-07-25-aws-serverless-deployments/7.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;While this was a fairly simple and small test the serverless framework does appear to do the job in helping to deploy the stacks with different stages and i’ll be using it in the future :D.&lt;/p&gt;
+
+&lt;p&gt;The sample code can be found &lt;a href=&quot;https://github.com/headly48/blog-samples/tree/master/lorem-lipsum-serverless&quot;&gt;here&lt;/a&gt;&lt;/p&gt;</content><author><name>Joshua</name></author><category term="AWS" /><category term="serverless" /><category term="lambda" /><summary type="html">In my last post I worked on my first lambda function and went through the process of manually setting up the function, gateway and roles. While this works it does slow down development considerably and I can see it quickly becoming a pain in the arse especially when dealing with different environment’s when releasing changes.</summary></entry><entry><title type="html">AWS - Creating my first lambda function</title><link href="http://localhost:4000/aws-first-lambda" rel="alternate" type="text/html" title="AWS - Creating my first lambda function" /><published>2017-07-25T20:00:00+10:00</published><updated>2017-07-25T20:00:00+10:00</updated><id>http://localhost:4000/aws-first-lambda</id><content type="html" xml:base="http://localhost:4000/aws-first-lambda">&lt;p&gt;Since creating my AWS account a few days ago i have been dying to try out there lambda functions and thought I should create a very simple rest endpoint that will return a lorem lipsum message.&lt;/p&gt;
+
+&lt;h2 id=&quot;creating-the-function&quot;&gt;Creating the function&lt;/h2&gt;
+&lt;p&gt;To get started I created a very basic index.js file in a new project with a function handler that will be called by aws.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;assets/posts/2018-07-25-aws-first-lambda/first.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;To keep it simple I used the lorem-ipsum node module available &lt;a href=&quot;https://www.npmjs.com/package/lorem-ipsum&quot;&gt;here&lt;/a&gt; which i pulled down using a package.json file and npm&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;assets/posts/2018-07-25-aws-first-lambda/second.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;I then created a zip folder containing the index.js file and also its dependencies in the node_modules subfolder.&lt;/p&gt;
+
+&lt;p&gt;I did run into an issue when zipping these folders where it created a folder wrapping these files in the artifact and as such when uploading and testing in AWS I received errors saying the handler does not exist.&lt;/p&gt;
+
+&lt;h2 id=&quot;mapping-the-lambda-function&quot;&gt;Mapping the lambda function&lt;/h2&gt;
+&lt;p&gt;Now that I had created the artifact it was time to login to the AWS console and go to the lambda &lt;a href=&quot;https://console.aws.amazon.com/lambda/home?#/create/configure-function&quot;&gt;dashboard&lt;/a&gt; to create the lambda and map it to the function that I just created.&lt;/p&gt;
+
+&lt;p&gt;Below is the configurations I used when configuring the new lambda&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;assets/posts/2018-07-25-aws-first-lambda/third.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Once done you should be able to test it out and if all works out well see the response :D&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;assets/posts/2018-07-25-aws-first-lambda/fourth.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;creating-the-gateway&quot;&gt;Creating the gateway&lt;/h2&gt;
+&lt;p&gt;Now that I had a function running I wanted to be able to trigger it and get the response using a rest call. This was setup by using the AWS &lt;a href=&quot;https://console.aws.amazon.com/apigateway/home&quot;&gt;gateway&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;First up I created an api and then created a get method to the lambda created above&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;assets/posts/2018-07-25-aws-first-lambda/fifth.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Once the method is created I tested it out within the gateway and all looks good&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;assets/posts/2018-07-25-aws-first-lambda/six.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The final step is to deploy the gateway API. At first I missed this step and was stuck wondering why I was receiving error’s when trying to hit the same endpoint that was displayed when testing.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;assets/posts/2018-07-25-aws-first-lambda/7.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Once done I was able to successfully hit the endpoint using postman and see the generated Lipsum text.&lt;/p&gt;
+
+&lt;p&gt;While I used the AWS console to manually configure the different components since it was my first time. Next time I would use their aws-cli and cloudformation to try and do it all automatically enabling quicker changes and updates to the function.&lt;/p&gt;
+
+&lt;p&gt;The code can be found &lt;a href=&quot;https://github.com/headly48/blog-samples/tree/master/lorem-lipsum-lambda&quot;&gt;here&lt;/a&gt;&lt;/p&gt;</content><author><name>Joshua</name></author><category term="AWS" /><category term="serverless" /><category term="lambda" /><summary type="html">Since creating my AWS account a few days ago i have been dying to try out there lambda functions and thought I should create a very simple rest endpoint that will return a lorem lipsum message.</summary></entry><entry><title type="html">The second coming of “Hello world”</title><link href="http://localhost:4000/hello-world" rel="alternate" type="text/html" title="The second coming of &quot;Hello world&quot;" /><published>2017-07-24T20:00:00+10:00</published><updated>2017-07-24T20:00:00+10:00</updated><id>http://localhost:4000/hello-world</id><content type="html" xml:base="http://localhost:4000/hello-world">&lt;p&gt;After having a pretty big hiatus I thought it was about time I give the whole blogging thing another crack, Fingers crossed this time sticks!&lt;/p&gt;
+
+&lt;p&gt;I thought I may as well also take the opportunity to try out a different solution for generating the blog.&lt;/p&gt;
+
+&lt;p&gt;Previously I used a combination of buster/ghost to host a local blog server and then generate the assets from this which turned out to be a tad annoying.&lt;/p&gt;
+
+&lt;p&gt;Now I trying out using the jenkell/jasper2 combo. Instead of having to run a server jenkell generates the static assets directly keeping it more simple so it just works.&lt;/p&gt;
+
+&lt;p&gt;I created this new one by&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Cloning the repo https://github.com/jekyller/jasper2&lt;/li&gt;
+  &lt;li&gt;Changing the destination property in the _config.yml to equal “../headly48.github.io/”&lt;/li&gt;
+  &lt;li&gt;Running the cmd “bundle install” to pull down the required gem dependencies&lt;/li&gt;
+  &lt;li&gt;Running the cmd “bundle exec jekyll serve” to generate the required static assets in the folder “../headly48.github.io/” and also to preview the site&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;And now if you can read this then pushing the generated folder to the git pages repo..&lt;/p&gt;
+
+&lt;p&gt;Until next time&lt;/p&gt;</content><author><name>Joshua</name></author><category term="Getting started" /><summary type="html">After having a pretty big hiatus I thought it was about time I give the whole blogging thing another crack, Fingers crossed this time sticks!</summary></entry></feed>

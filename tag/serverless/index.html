@@ -1,132 +1,318 @@
-
+<!DOCTYPE html>
+<html>
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-    <title>Serverless - Josh's Tech Blog</title>
-    <meta name="description" content="Auto deploying application into AWS using https://serverless.com/">
-	
-	<meta name="google-site-verification" content="mV9dWaG3eoW-q9NUnP6RKamBZn6R1_dtO0ojaj99Vb0">
+    <!-- Document Settings -->
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
-    <meta name="HandheldFriendly" content="True">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Base Meta -->
+    <!-- dynamically fixing the title for tag/author pages -->
 
-    <link rel="shortcut icon" href="../../favicon.ico">
 
-    <link rel="stylesheet" type="text/css" href="../../assets/css/screen.css?v=a8cb9de651">
-    <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic%7COpen+Sans:700,400">
 
-    <link rel="canonical" href="http://headly48.github.io/tag/serverless/">
-    <meta name="referrer" content="no-referrer-when-downgrade">
-    
-    <meta property="og:site_name" content="Josh's Tech Blog">
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="Serverless - Josh's Tech Blog">
-    <meta property="og:description" content="Auto deploying application into AWS using https://serverless.com/">
-    <meta property="og:url" content="http://headly48.github.io/tag/serverless/">
-    <meta property="article:modified_time" content="2016-11-30T09:49:13.000Z">
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Serverless - Josh's Tech Blog">
-    <meta name="twitter:description" content="Auto deploying application into AWS using https://serverless.com/">
-    <meta name="twitter:url" content="http://headly48.github.io/tag/serverless/">
-    
+    <title>Serverless - Headly's blog of things</title>
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Styles'n'Scripts -->
+    <link rel="stylesheet" type="text/css" href="/assets/built/screen.css" />
+    <link rel="stylesheet" type="text/css" href="/assets/built/screen.edited.css" />
+    <link rel="stylesheet" type="text/css" href="/assets/built/syntax.css" />
+    <!-- highlight.js -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
+    <style>.hljs { background: none; }</style>
+
+    <!-- This tag outputs SEO meta+structured data and other important settings -->
+    <meta name="description" content="A blog mostly about techie things" />
+    <link rel="shortcut icon" href="http://localhost:4000/assets/images/favicon.png" type="image/png" />
+    <link rel="canonical" href="http://localhost:4000/tag/serverless/" />
+    <meta name="referrer" content="no-referrer-when-downgrade" />
+
+     <!--title below is coming from _includes/dynamic_title-->
+    <meta property="og:site_name" content="Headly's blog of things" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Serverless - Headly's blog of things" />
+    <meta property="og:description" content="A blog mostly about techie things" />
+    <meta property="og:url" content="http://localhost:4000/tag/serverless/" />
+    <meta property="og:image" content="http://localhost:4000/assets/images/blog-cover.jpg" />
+    <meta property="article:publisher" content="https://www.facebook.com/" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Serverless - Headly's blog of things" />
+    <meta name="twitter:description" content="A blog mostly about techie things" />
+    <meta name="twitter:url" content="http://localhost:4000/" />
+    <meta name="twitter:image" content="http://localhost:4000/assets/images/blog-cover.jpg" />
+    <meta name="twitter:label1" content="Written by" />
+    <meta name="twitter:data1" content="Headly's blog of things" />
+    <meta name="twitter:site" content="@" />
+    <meta name="twitter:creator" content="@" />
+    <meta property="og:image:width" content="2000" />
+    <meta property="og:image:height" content="666" />
+
     <script type="application/ld+json">
 {
     "@context": "https://schema.org",
-    "@type": "Series",
+    "@type": "Website",
     "publisher": {
         "@type": "Organization",
-        "name": "Josh&#x27;s Tech Blog",
-        "logo": "http://headly48.github.io/ghost/img/ghosticon.jpg"
+        "name": "Headly's blog of things",
+        "logo": "http://localhost:4000/"
     },
-    "url": "http://headly48.github.io/tag/serverless/",
-    "name": "Serverless",
+    "url": "http://localhost:4000/tag/serverless/",
+    "image": {
+        "@type": "ImageObject",
+        "url": "http://localhost:4000/assets/images/blog-cover.jpg",
+        "width": 2000,
+        "height": 666
+    },
     "mainEntityOfPage": {
         "@type": "WebPage",
-        "@id": "http://headly48.github.io"
+        "@id": "http://localhost:4000/tag/serverless/"
     },
-    "description": "Auto deploying application into AWS using https://serverless.com/"
+    "description": "A blog mostly about techie things"
 }
     </script>
 
-    <meta name="generator" content="Ghost 0.11">
-    <link rel="alternate" type="application/rss+xml" title="Josh's Tech Blog" href="http://headly48.github.io/rss/">
+    <!-- <script type="text/javascript" src="https://demo.ghost.io/public/ghost-sdk.min.js?v=724281a32e"></script>
+    <script type="text/javascript">
+    ghost.init({
+    	clientId: "ghost-frontend",
+    	clientSecret: "f84a07a72b17"
+    });
+    </script> -->
+
+    <meta name="generator" content="Jekyll 3.6.2" />
+    <link rel="alternate" type="application/rss+xml" title="Tag Page" href="/feed.xml" />
+
+
 </head>
-<body class="tag-template tag-serverless nav-closed">
-
-    <div class="nav">
-    <h3 class="nav-title">Menu</h3>
-    <a href="index.html#" class="nav-close">
-        <span class="hidden">Close</span>
-    </a>
-    <ul>
-            <li class="nav-home" role="presentation"><a href="http://headly48.github.io/">Home</a></li>
-    </ul>
-        <a class="subscribe-button icon-feed" href="http://headly48.github.io/rss/">Subscribe</a>
-</div>
-<span class="nav-cover"></span>
-
+<body class="tag-template">
 
     <div class="site-wrapper">
+        <!-- All the main content gets inserted here, index.hbs, post.hbs, etc -->
+        <!-- default -->
+<!-- The tag above means - insert everything in this file into the {body} of the default.hbs template -->
+
+<!-- The big featured header, it uses blog cover image as a BG if available -->
+<!-- #tag -->
+<!-- dynamically loading backgrounds for tags,  descriptions and page titles -->
+
+
+<header class="site-header outer no-cover">
+    <div class="inner">
+        <nav class="site-nav">
+    <div class="site-nav-left">
+        
+            
+                <a class="site-nav-logo" href="http://localhost:4000/">Headly's blog of things</a>
+            
+        
+        
+            <ul class="nav" role="menu">
+    <li class="nav-home" role="menuitem"><a href="/">Home</a></li>
+    <!-- <li class="nav-about" role="menuitem"><a href="/about/">About</a></li> -->
+    <!-- <li class="nav-getting-started" role="menuitem"><a href="/tag/getting-started/">Getting Started</a></li> -->
+    <!-- <li class="nav-try-ghost" role="menuitem"><a href="https://ghost.org">Try Ghost</a></li> -->
+</ul>
 
         
-<header class="main-header tag-head " style="background-image: url(../../content/images/2016/08/lightning-1550383-1.jpg)">
-    <nav class="main-nav overlay clearfix">
+    </div>
+    <div class="site-nav-right">
+        <div class="social-links">
+            
+            
+        </div>
         
-            <a class="menu-button icon-menu" href="index.html#"><span class="word">Menu</span></a>
-    </nav>
-    <div class="vertical">
-        <div class="main-header-content inner">
-            <h1 class="page-title">Serverless</h1>
-            <h2 class="page-description">
-                    Auto deploying application into AWS using https://serverless.com/
+    </div>
+</nav>
+
+        <div class="site-header-content">
+            <h1 class="site-title">Serverless</h1>
+            <h2 class="site-description">
+                
+    			    A collection of 2 posts
+                
             </h2>
         </div>
     </div>
 </header>
+<!-- tag -->
 
-<main class="content" role="main">
-
-    <div class="extra-pagination inner">
-    <nav class="pagination" role="navigation">
-    <span class="page-number">Page 1 of 1</span>
-</nav>
-
-</div>
-
-<article class="post tag-aws-lambda tag-serverless">
-    <header class="post-header">
-        <h2 class="post-title"><a href="../../severless-making-lambda-deployments-easy/">Serverless - Making lambda deployments easy</a></h2>
-    </header>
-    <section class="post-excerpt">
-        <p>In my last post I worked on my first lambda function and went through the process of manually setting up the function, gateway and roles. While <a class="read-more" href="../../severless-making-lambda-deployments-easy/">»</a></p>
-    </section>
-    <footer class="post-meta">
+<!-- The main content area -->
+<main id="site-main" class="site-main outer" role="main">
+    <div class="inner">
+        <div class="post-feed">
+            <!-- The tag below includes the markup for each post - partials/post-card.hbs -->
+            
+    <article class="post-card tag-template">
         
-        <a href="../../author/joshua/">Joshua Head</a>
-         on <a href="../aws-lambda/">AWS Lambda</a>, <a href="index.html">Serverless</a>
-        <time class="post-date" datetime="2016-11-26">26 November 2016</time>
-    </footer>
-</article>
+            <a class="post-card-image-link" href="/aws-serverless-deployments">
+                <div class="post-card-image" style="background-image: url(/assets/posts/2018-07-25-aws-serverless-deployments/cover.jpg)"></div>
+            </a>
+        
+        <div class="post-card-content">
+            <a class="post-card-content-link" href="/aws-serverless-deployments">
+                <header class="post-card-header">
+                    
+                        
+                            
+                               <span class="post-card-tags">Aws</span>
+                            
+                        
+                            
+                               <span class="post-card-tags">Serverless</span>
+                            
+                        
+                            
+                                <span class="post-card-tags">Lambda</span>
+                            
+                        
+                    
 
-<nav class="pagination" role="navigation">
-    <span class="page-number">Page 1 of 1</span>
-</nav>
+                    <h2 class="post-card-title">Serverless - Making lambda deployments easy</h2>
+                </header>
+                <section class="post-card-excerpt">
+                    <p>In my last post I worked on my first lambda function and went through the process of manually setting up the function, gateway and roles. While this works it does slow down development</p>
+                </section>
+            </a>
+            <footer class="post-card-meta">
+                
+                    
+                        
+                        <img class="author-profile-image" src="/assets/images/me.jpg" alt="Joshua" />
+                        
+                        <span class="post-card-author">
+                            <a href="/author/headly48/">Joshua</a>
+                        </span>
+                    
+                
+            </footer>
+        </div>
+    </article>
+
+    <article class="post-card tag-template">
+        
+            <a class="post-card-image-link" href="/aws-first-lambda">
+                <div class="post-card-image" style="background-image: url(/assets/posts/2018-07-25-aws-first-lambda/cover.jpg)"></div>
+            </a>
+        
+        <div class="post-card-content">
+            <a class="post-card-content-link" href="/aws-first-lambda">
+                <header class="post-card-header">
+                    
+                        
+                            
+                               <span class="post-card-tags">Aws</span>
+                            
+                        
+                            
+                               <span class="post-card-tags">Serverless</span>
+                            
+                        
+                            
+                                <span class="post-card-tags">Lambda</span>
+                            
+                        
+                    
+
+                    <h2 class="post-card-title">AWS - Creating my first lambda function</h2>
+                </header>
+                <section class="post-card-excerpt">
+                    <p>Since creating my AWS account a few days ago i have been dying to try out there lambda functions and thought I should create a very simple rest endpoint that will return a</p>
+                </section>
+            </a>
+            <footer class="post-card-meta">
+                
+                    
+                        
+                        <img class="author-profile-image" src="/assets/images/me.jpg" alt="Joshua" />
+                        
+                        <span class="post-card-author">
+                            <a href="/author/headly48/">Joshua</a>
+                        </span>
+                    
+                
+            </footer>
+        </div>
+    </article>
 
 
+        </div>
+    </div>
 </main>
 
 
-        <footer class="site-footer clearfix">
-            <section class="copyright"><a href="http://headly48.github.io">Josh's Tech Blog</a> © 2016</section>
-            <section class="poweredby">Proudly published with <a href="https://ghost.org">Ghost</a></section>
+        <!-- Previous/next page links - displayed on every page -->
+        
+
+        <!-- The footer at the very bottom of the screen -->
+        <footer class="site-footer outer">
+            <div class="site-footer-content inner">
+                <section class="copyright"><a href="http://localhost:4000/">Headly's blog of things</a> &copy; 2018</section>
+                <section class="poweredby">Proudly published with <a href="https://jekyllrb.com/">Jekyll</a> &
+                    <a href="https://pages.github.com/" target="_blank" rel="noopener">GitHub Pages</a> using
+                    <a href="https://github.com/jekyller/jasper2" target="_blank" rel="noopener">Jasper2</a></section>
+                <nav class="site-footer-nav">
+                    <a href="/">Latest Posts</a>
+                    
+                    
+                    <a href="https://ghost.org" target="_blank" rel="noopener">Ghost</a>
+                </nav>
+            </div>
         </footer>
 
     </div>
 
-    <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+    <!-- The big email subscribe modal content -->
     
-    <script type="text/javascript" src="../../assets/js/jquery.fitvids.js?v=a8cb9de651"></script>
-    <script type="text/javascript" src="../../assets/js/index.js?v=a8cb9de651"></script>
+
+    <!-- highlight.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.10.0/components/prism-abap.min.js"></script>
+    <script>$(document).ready(function() {
+      $('pre code').each(function(i, block) {
+        hljs.highlightBlock(block);
+      });
+    });</script>
+
+    <!-- jQuery + Fitvids, which makes all video embeds responsive -->
+    <script
+        src="https://code.jquery.com/jquery-3.2.1.min.js"
+        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+        crossorigin="anonymous">
+    </script>
+    <script type="text/javascript" src="/assets/js/jquery.fitvids.js"></script>
+    <script type="text/javascript" src="https://demo.ghost.io/assets/js/jquery.fitvids.js?v=724281a32e"></script>
+
+
+    <!-- Paginator increased to "infinit" in _config.yml -->
+    <!-- if paginator.posts  -->
+    <!-- <script>
+        var maxPages = parseInt('1');
+    </script>
+    <script src="/assets/js/infinitescroll.js"></script> -->
+    <!-- /endif -->
+
+    
+
+
+    <!-- Add Google Analytics  -->
+    <!-- Google Analytics Tracking code -->
+ <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', '', 'auto');
+  ga('send', 'pageview');
+
+ </script>
+
+
+    <!-- The #block helper will pull in data from the #contentFor other template files. In this case, there's some JavaScript which we only want to use in post.hbs, but it needs to be included down here, after jQuery has already loaded. -->
+    
+
+    <!-- Ghost outputs important scripts and data with this tag - it should always be the very last thing before the closing body tag -->
+    <!-- ghost_foot -->
 
 </body>
+</html>

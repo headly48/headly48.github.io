@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <!-- Document Settings -->
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!-- Base Meta -->
+    <!-- dynamically fixing the title for tag/author pages -->
+
+
+
+    <title>Creating a CRUD API with AWS lambda and dynamoDB</title>
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Styles'n'Scripts -->
+    <link rel="stylesheet" type="text/css" href="/assets/built/screen.css" />
+    <link rel="stylesheet" type="text/css" href="/assets/built/screen.edited.css" />
+    <link rel="stylesheet" type="text/css" href="/assets/built/syntax.css" />
+    <!-- highlight.js -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
+    <style>.hljs { background: none; }</style>
+
+    <!-- This tag outputs SEO meta+structured data and other important settings -->
+    <meta name="description" content="A blog mostly about techie things" />
+    <link rel="shortcut icon" href="http://localhost:4000/assets/images/favicon.png" type="image/png" />
+    <link rel="canonical" href="http://localhost:4000/aws-serverless-crud" />
+    <meta name="referrer" content="no-referrer-when-downgrade" />
+
+     <!--title below is coming from _includes/dynamic_title-->
+    <meta property="og:site_name" content="Headly's blog of things" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Creating a CRUD API with AWS lambda and dynamoDB" />
+    <meta property="og:description" content="Intro The last few lambda functions I have created have been very basic in nature as they returned simple responses with no error handling or other integrations needed. So I thought I should try creating a slightly more complex CRUD API that links to a dynamoDB table to store a" />
+    <meta property="og:url" content="http://localhost:4000/aws-serverless-crud" />
+    <meta property="og:image" content="http://localhost:4000/assets/posts/2018-07-25-aws-serverless-crud/cover.jpg" />
+    <meta property="article:publisher" content="https://www.facebook.com/" />
+    <meta property="article:author" content="https://www.facebook.com/" />
+    <meta property="article:published_time" content="2017-07-25T22:00:00+10:00" />
+    <meta property="article:modified_time" content="2017-07-25T22:00:00+10:00" />
+    <meta property="article:tag" content="Aws" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Creating a CRUD API with AWS lambda and dynamoDB" />
+    <meta name="twitter:description" content="Intro The last few lambda functions I have created have been very basic in nature as they returned simple responses with no error handling or other integrations needed. So I thought I should try creating a slightly more complex CRUD API that links to a dynamoDB table to store a" />
+    <meta name="twitter:url" content="http://localhost:4000/" />
+    <meta name="twitter:image" content="http://localhost:4000/assets/posts/2018-07-25-aws-serverless-crud/cover.jpg" />
+    <meta name="twitter:label1" content="Written by" />
+    <meta name="twitter:data1" content="Headly's blog of things" />
+    <meta name="twitter:label2" content="Filed under" />
+    <meta name="twitter:data2" content="Aws" />
+    <meta name="twitter:site" content="@" />
+    <meta name="twitter:creator" content="@" />
+    <meta property="og:image:width" content="1400" />
+    <meta property="og:image:height" content="933" />
+
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Website",
+    "publisher": {
+        "@type": "Organization",
+        "name": "Headly's blog of things",
+        "logo": "http://localhost:4000/"
+    },
+    "url": "http://localhost:4000/aws-serverless-crud",
+    "image": {
+        "@type": "ImageObject",
+        "url": "http://localhost:4000/assets/posts/2018-07-25-aws-serverless-crud/cover.jpg",
+        "width": 2000,
+        "height": 666
+    },
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "http://localhost:4000/aws-serverless-crud"
+    },
+    "description": "Intro The last few lambda functions I have created have been very basic in nature as they returned simple responses with no error handling or other integrations needed. So I thought I should try creating a slightly more complex CRUD API that links to a dynamoDB table to store a"
+}
+    </script>
+
+    <!-- <script type="text/javascript" src="https://demo.ghost.io/public/ghost-sdk.min.js?v=724281a32e"></script>
+    <script type="text/javascript">
+    ghost.init({
+    	clientId: "ghost-frontend",
+    	clientSecret: "f84a07a72b17"
+    });
+    </script> -->
+
+    <meta name="generator" content="Jekyll 3.6.2" />
+    <link rel="alternate" type="application/rss+xml" title="Creating a CRUD API with AWS lambda and dynamoDB" href="/feed.xml" />
+
+
+</head>
+<body class="post-template">
+
+    <div class="site-wrapper">
+        <!-- All the main content gets inserted here, index.hbs, post.hbs, etc -->
+        <!-- default -->
+
+<!-- The tag above means: insert everything in this file
+into the {body} of the default.hbs template -->
+
+<header class="site-header outer">
+    <div class="inner">
+        <nav class="site-nav">
+    <div class="site-nav-left">
+        
+            
+                <a class="site-nav-logo" href="http://localhost:4000/">Headly's blog of things</a>
+            
+        
+        
+            <ul class="nav" role="menu">
+    <li class="nav-home" role="menuitem"><a href="/">Home</a></li>
+    <!-- <li class="nav-about" role="menuitem"><a href="/about/">About</a></li> -->
+    <!-- <li class="nav-getting-started" role="menuitem"><a href="/tag/getting-started/">Getting Started</a></li> -->
+    <!-- <li class="nav-try-ghost" role="menuitem"><a href="https://ghost.org">Try Ghost</a></li> -->
+</ul>
+
+        
+    </div>
+    <div class="site-nav-right">
+        <div class="social-links">
+            
+            
+        </div>
+        
+    </div>
+</nav>
+
+    </div>
+</header>
+
+<!-- Everything inside the #post tags pulls data from the post -->
+<!-- #post -->
+
+<main id="site-main" class="site-main outer" role="main">
+    <div class="inner">
+
+        <article class="post-full post ">
+
+            <header class="post-full-header">
+                <section class="post-full-meta">
+                    <time class="post-full-meta-date" datetime="25 July 2017">25 July 2017</time>
+                    
+                        <span class="date-divider">/</span>
+                        
+                            
+                               <a href='/tag/aws/'>AWS</a>,
+                            
+                        
+                            
+                               <a href='/tag/dynamodb/'>DYNAMODB</a>,
+                            
+                        
+                            
+                               <a href='/tag/lambda/'>LAMBDA</a>
+                            
+                        
+                    
+                </section>
+                <h1 class="post-full-title">Creating a CRUD API with AWS lambda and dynamoDB</h1>
+            </header>
+
+            
+            <figure class="post-full-image" style="background-image: url(/assets/posts/2018-07-25-aws-serverless-crud/cover.jpg)">
+            </figure>
+            
+
+            <section class="post-full-content">
+                <div class="kg-card-markdown">
+                    <h2 id="intro">Intro</h2>
+
+<p>The last few lambda functions I have created have been very basic in nature as they returned simple responses with no error handling or other integrations needed.</p>
+
+<p>So I thought I should try creating a slightly more complex CRUD API that links to a dynamoDB table to store a users information and skills.</p>
+
+<p>To implement this I used the following:</p>
+
+<ul>
+  <li><a href="https://serverless.com/">Serverless</a></li>
+  <li>DynamoDb</li>
+  <li>AWS Lambda</li>
+  <li>Node 4.3.2</li>
+</ul>
+
+<h2 id="creating-the-dynamodb-table">Creating the dynamoDB table</h2>
+<p>First up I needed to create a database for our api/functions to store the data in.</p>
+
+<p>To provision the dynamoDb table I added the following into my serverless.yml file.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>resources:  
+  Resources:
+    usersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: user-skills-CRUD-usersTable-${opt:stage}
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    DynamoDBIamPolicy:
+          Type: AWS::IAM::Policy
+          DependsOn: usersTable
+          Properties:
+            PolicyName: lambda-dynamodb
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - dynamodb:GetItem
+                    - dynamodb:PutItem
+                    - dynamodb:ListTables
+                    - dynamodb:DeleteItem
+                    - dynamodb:Query
+                    - dynamodb:UpdateItem
+                  Resource: arn:aws:dynamodb:*:*:table/user-skills-CRUD*
+            Roles:
+              - Ref: IamRoleLambdaExecution
+</code></pre></div></div>
+
+<p>This will create a table with the name “user-skills-CRUD-usersTable-${opt:stage}” where the “opt:stage” variable is replaced with the stage that I am deploying too. This allowed me to have different tables for each of my different environments.</p>
+
+<p>The DynamoDBIamPolicy section is used by serverless to create a policy with the permissions defined and assigns it to the lambda functions. Without this the functions would not be able to access the table.</p>
+
+<p>I also define the key of the table to be the userId which is a string as it will be a GUID.</p>
+
+<h2 id="endpoints">Endpoints</h2>
+<p>Now that I have the database table setup and the permissions all ready to go it’s now time to define the endpoints and the lambda functions that they will map to.</p>
+
+<p>As part of this API I wanted to implement the following endpoints:</p>
+<ul>
+  <li>(POST) /users - Create a user</li>
+  <li>(PUT) /users/{userId} - Update the users details</li>
+  <li>(DELETE) /users/{userId} - Delete the user</li>
+  <li>(GET) /users/{userId} - Read the users details</li>
+</ul>
+
+<p>To provision the endpoints in the gateway I added the following into my serverless.yml file</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>functions:  
+  getUser:
+    handler: index.getUser
+    events:
+      - http:
+          path: users/{userId}
+          method: get
+    environment:
+      usersTableName: user-skills-CRUD-usersTable-${opt:stage}
+  deleteUser:
+    handler: index.deleteUser
+    events:
+      - http:
+          path: users/{userId}
+          method: delete
+    environment:
+      usersTableName: user-skills-CRUD-usersTable-${opt:stage}
+  createUser:
+    handler: index.createUser
+    events:
+      - http:
+          path: users
+          method: post
+    environment:
+      usersTableName: user-skills-CRUD-usersTable-${opt:stage}
+  updateUser:
+    handler: index.updateUser
+    events:
+      - http:
+          path: users/{userId}
+          method: put
+    environment:
+      usersTableName: user-skills-CRUD-usersTable-${opt:stage}
+
+</code></pre></div></div>
+
+<p>This will create the four endpoints and also inject the table name as an environment variable into the function. Unfortunately while serverless does offer a service wide environment variable I was unable to get this to work and was forced to repeat this in each individual function which makes it slightly less clean :(</p>
+
+<p>The variable “{userId}” in the paths will be added to the event object that is passed into the lambda function. So can be accessed like “event.pathParameters.userId”</p>
+
+<h2 id="functions">Functions</h2>
+<p>Now that everything is mapped it was time to actually start writing the code behind the functions.</p>
+
+<p>To get started I wanted to wire up the database for local development. Locally I ran dynamoDB using docker the container can be found <a href="https://hub.docker.com/r/deangiberson/aws-dynamodb-local/">here</a></p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>const AWS = require('aws-sdk');
+
+let dynamoDb;
+
+//Set dynamoDbEndpoint if it exists
+if (process.env.dynamoDbEndpoint) {  
+  console.log('*** Manually setting dynamoDb config');
+  dynamoDb = new AWS.DynamoDB({accessKeyId: 'headly48', secretAccessKey: '123', region: 'us-west-2', endpoint: new AWS.Endpoint(process.env.dynamoDbEndpoint)});
+} else {
+  dynamoDb = new AWS.DynamoDB();
+}
+</code></pre></div></div>
+
+<p>So in the index.js file I added the above code which creates a new dynamoDB with my local endpoint otherwise it defaults to using my AWS configured settings.</p>
+
+<p>So if I want to call the createUser function against my local DB I ran the following in the command line</p>
+
+<p><code class="highlighter-rouge">node -e 'process.env.dynamoDbEndpoint = "http://192.168.99.100:8000"; require("./index.js").createUser(}, null, function (blah, res) {console.log(res)})'</code></p>
+
+<p>Now that’s sorted I created a userService class which is responsible for making the calls to the database.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>class UserService {  
+  constructor (dynamoDb, tableName) {
+
+      this.dynamoDb = dynamoDb;
+      this.tableName = tableName;
+  }
+}
+</code></pre></div></div>
+
+<p>And initialized it in the index.js by passing in the dbConnection and tableName</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let userService = new UserService(dynamoDb, process.env.usersTableName);  
+</code></pre></div></div>
+
+<p>Now I just needed to create the createUser function in my index.js.</p>
+
+<p>This function first validates the users email is present and then makes a call to the userService which returns a promise. If the user has been successfully saved then it will return the userId in the body with a httpStatus of 201 else returns a 500.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>module.exports.createUser = (event, context, callback) =&gt; {
+
+  let requestBody = JSON.parse(event.body);
+
+  if(!requestBody.email) {
+    return callback(null, {statusCode: 400, body: JSON.stringify({error: 'Please provide users email'})});
+  }
+
+  userService.createUser(requestBody).then(function (user) {
+
+    callback(null, {statusCode: 201, body: JSON.stringify(user)});
+  }).catch(function (error) {
+    console.log('Error creating user. ' + error);
+    callback(error);
+  });
+};
+</code></pre></div></div>
+
+<p>Below is the createUser function in the userService. It generates a userId and creates the param to pass to dynamoDb and returns a promise.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>createUser(userDetails) {
+
+    let userId = uuidGenerator.v4();
+
+    var params = {
+        TableName: this.tableName,
+        Item: {
+          userId: { S: userId},
+          email: {S: userDetails.email}
+        }
+    };
+
+    if (userDetails.skills) {
+      params.Item.skills = {SS: userDetails.skills}
+    }
+
+    return this.dynamoDb.putItem(params).promise().then(function (data) {
+      console.log('Created user ' + userId);
+
+      return {userId: userId};
+    });
+  }
+</code></pre></div></div>
+
+<p>Next the getUser function in the index.js.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>module.exports.getUser = (event, context, callback) =&gt; {
+
+  if (!event.pathParameters.userId || !uuidvalidator(event.pathParameters.userId)) {
+
+    return callback(null, {statusCode: 400, body: JSON.stringify({error: 'UserId is invalid'})});
+  }
+
+  userService.getUser(event.pathParameters.userId).then(function (data) {
+
+    if (!data || Object.keys(data).length === 0) {
+
+      callback(null, {statusCode: 404, body: {message: 'User does not exist'}});
+    } else {
+
+      callback(null, {statusCode: 200, body: JSON.stringify(data)});
+    }
+  }).catch(function (error) {
+
+    callback(JSON.stringify({error: error}));
+  });
+};
+</code></pre></div></div>
+
+<p>And the userService function it calls</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>getUser (userId) {
+
+    var params = {
+        TableName: this.tableName,
+        Key: { // a map of attribute name to AttributeValue for all primary key attributes
+            userId: { S: userId}
+        },
+        AttributesToGet: [
+            'userId',
+            'email',
+            'skills'
+        ]
+    };
+    return this.dynamoDb.getItem(params).promise().then(function (data) {
+      let user = {};
+      user.userId = data.Item.userId.S;
+      user.skills = data.Item.skills.SS;
+
+      return user;
+    });
+  }
+</code></pre></div></div>
+
+<p>Next the updateUser function in the index.js</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>module.exports.updateUser = (event, context, callback) =&gt; {
+
+  if (!event.pathParameters.userId || !uuidvalidator(event.pathParameters.userId)) {
+
+    return callback(null, {statusCode: 400, body: JSON.stringify({error: 'UserId is invalid'})});
+  }
+
+  let requestBody = JSON.parse(event.body);
+
+  if(!requestBody.email) {
+    return callback(null, {statusCode: 400, body: JSON.stringify({error: 'Please provide users email'})});
+  }
+
+  userService.updateUser(event.pathParameters.userId, requestBody).then(function () {
+
+    callback(null, {statusCode: 204});
+  }).catch(function (error) {
+    console.log('Error creating user. ' + error);
+    callback(error);
+  });
+};
+</code></pre></div></div>
+
+<p>And the function in the userService</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>updateUser (userId, userDetails) {
+
+  var params = {
+      TableName: this.tableName,
+      Key: { // a map of attribute name to AttributeValue for all primary key attributes
+        userId: { S: userId}
+      },
+      AttributeUpdates: {}
+  };
+
+  if (userDetails.email) {
+    params.AttributeUpdates.email = {
+      Action: 'PUT',
+      Value: {S: userDetails.email}
+    }
+  }
+
+  if (userDetails.skills) {
+    params.AttributeUpdates.skills = {
+      Action: 'PUT',
+      Value: {SS: userDetails.skills}
+    }
+  }
+
+  return this.dynamoDb.updateItem(params).promise();
+}
+</code></pre></div></div>
+
+<p>Finally is the deleteUser function</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>module.exports.deleteUser = (event, context, callback) =&gt; {
+
+  let requestBody = JSON.parse(event.body);
+
+  if (!event.pathParameters.userId || !uuidvalidator(event.pathParameters.userId)) {
+
+    return callback(null, {statusCode: 400, body: JSON.stringify({error: 'UserId is invalid'})});
+  }
+
+  userService.deleteUser(event.pathParameters.userId).then(function () {
+
+    callback(null, {statusCode: 204});
+  }).catch(function (error) {
+    console.log('Error creating user. ' + error);
+    callback(error);
+  });
+};
+</code></pre></div></div>
+
+<p>And the function in the userService</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>deleteUser(userId) {
+
+  var params = {
+      TableName: this.tableName,
+      Key: {
+        userId: { S: userId}
+      }
+  };
+
+  return this.dynamoDb.deleteItem(params).promise();
+}
+</code></pre></div></div>
+
+<h2 id="deploying">Deploying</h2>
+
+<p>Now for the fun part :D.
+Deploying to AWS which is as simple as running the command</p>
+
+<p><code class="highlighter-rouge">serverless deploy --stage dev</code></p>
+
+<p><img src="assets/posts/2018-07-25-aws-serverless-crud/1.jpg" alt="" /></p>
+
+<p>As I have used the stage var in the serverless.yml file I now have to include the stage manually which is a little annoying and it would be nice if serverless picked up the default opts.</p>
+
+<h2 id="summary">Summary</h2>
+
+<p>It seemed fairly straightforward to get everything connected and working. It did take some time to workout the permissions that needed to be set and also setting environment variables/tableName was very fiddly and so ended up keeping it simple rather then constantly redeploying to see if changes to the service wide env variables fixed the issue of not being picked up correctly.</p>
+
+<p>The postman collection to test the endpoints can be found <a href="https://www.getpostman.com/collections/34d0ceaf9a0b6d66922b">here</a>
+To see the full code and more commands to run locally checkout my <a href="https://github.com/headly48/blog-samples/tree/master/user-skills-CRUD">Github</a></p>
+
+                </div>
+            </section>
+
+            <!-- Email subscribe form at the bottom of the page -->
+            
+
+            <footer class="post-full-footer">
+                <!-- Everything inside the #author tags pulls data from the author -->
+                <!-- #author-->
+                
+                    
+                        <section class="author-card">
+                            
+                                <img class="author-profile-image" src="/assets/images/me.jpg" alt="headly48" />
+                            
+                            <section class="author-card-content">
+                                <h4 class="author-card-name"><a href="/author/headly48">Joshua</a></h4>
+                                
+                                    <p>Full stack web developer</p>
+                                
+                            </section>
+                        </section>
+                        <div class="post-full-footer-right">
+                            <a class="author-card-button" href="/author/headly48">Read More</a>
+                        </div>
+                    
+                
+                <!-- /author  -->
+            </footer>
+
+            <!-- If you use Disqus comments, just uncomment this block.
+            The only thing you need to change is "test-apkdzgmqhj" - which
+            should be replaced with your own Disqus site-id. -->
+            
+                <section class="post-full-comments">
+                    <div id="disqus_thread"></div>
+                    <script>
+                        var disqus_config = function () {
+                            this.page.url = 'http://localhost:4000/';
+                            this.page.identifier = 'Headly's blog of things';
+                        };
+                        (function() {
+                            var d = document, s = d.createElement('script');
+                            s.src = 'https://https-headly48-github-io.disqus.com/embed.js';
+                            s.setAttribute('data-timestamp', +new Date());
+                            (d.head || d.body).appendChild(s);
+                        })();
+                    </script>
+                </section>
+            
+
+        </article>
+
+    </div>
+</main>
+
+<!-- Links to Previous/Next posts -->
+<aside class="read-next outer">
+    <div class="inner">
+        <div class="read-next-feed">
+            
+                
+                
+                
+                
+                    <article class="read-next-card"
+                        
+                            style="background-image: url(/assets/images/blog-cover.jpg)"
+                        
+                    >
+                        <header class="read-next-card-header">
+                            <small class="read-next-card-header-sitetitle">&mdash; Headly's blog of things &mdash;</small>
+                            
+                                <h3 class="read-next-card-header-title"><a href="/tag/aws/">Aws</a></h3>
+                            
+                        </header>
+                        <div class="read-next-divider"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 14.5s2 3 5 3 5.5-2.463 5.5-5.5S21 6.5 18 6.5c-5 0-7 11-12 11C2.962 17.5.5 15.037.5 12S3 6.5 6 6.5s4.5 3.5 4.5 3.5"/></svg>
+</div>
+                        <div class="read-next-card-content">
+                            <ul>
+                                
+                                
+                                  
+                                    
+                                  
+                                
+                                  
+                                    
+                                        
+                                        
+                                            <li><a href="/aws-serverless-deployments">Serverless - Making lambda deployments easy</a></li>
+                                        
+                                    
+                                  
+                                
+                                  
+                                    
+                                        
+                                        
+                                            <li><a href="/aws-first-lambda">AWS - Creating my first lambda function</a></li>
+                                        
+                                    
+                                  
+                                
+                                  
+                                
+                            </ul>
+                        </div>
+                        <footer class="read-next-card-footer">
+                            <a href="/tag/aws/">
+                                
+                                    See all 2 posts  →
+                                
+                            </a>
+                        </footer>
+                    </article>
+                
+            
+
+            <!-- If there's a next post, display it using the same markup included from - partials/post-card.hbs -->
+            
+
+            <!-- If there's a previous post, display it using the same markup included from - partials/post-card.hbs -->
+            
+                
+    <article class="post-card post-template">
+        
+            <a class="post-card-image-link" href="/aws-serverless-deployments">
+                <div class="post-card-image" style="background-image: url(/assets/posts/2018-07-25-aws-serverless-deployments/cover.jpg)"></div>
+            </a>
+        
+        <div class="post-card-content">
+            <a class="post-card-content-link" href="/aws-serverless-deployments">
+                <header class="post-card-header">
+                    
+                        
+                            
+                               <span class="post-card-tags">Aws</span>
+                            
+                        
+                            
+                               <span class="post-card-tags">Serverless</span>
+                            
+                        
+                            
+                                <span class="post-card-tags">Lambda</span>
+                            
+                        
+                    
+
+                    <h2 class="post-card-title">Serverless - Making lambda deployments easy</h2>
+                </header>
+                <section class="post-card-excerpt">
+                    <p>In my last post I worked on my first lambda function and went through the process of manually setting up the function, gateway and roles. While this works it does slow down development</p>
+                </section>
+            </a>
+            <footer class="post-card-meta">
+                
+                    
+                        
+                        <img class="author-profile-image" src="/assets/images/me.jpg" alt="Joshua" />
+                        
+                        <span class="post-card-author">
+                            <a href="/author/headly48/">Joshua</a>
+                        </span>
+                    
+                
+            </footer>
+        </div>
+    </article>
+
+            
+
+        </div>
+    </div>
+</aside>
+
+<!-- Floating header which appears on-scroll, included from includes/floating-header.hbs -->
+<div class="floating-header">
+    <div class="floating-header-logo">
+        <a href="http://localhost:4000/">
+            
+                <img src="/assets/images/favicon.png" alt="Headly's blog of things icon" />
+            
+            <span>Headly's blog of things</span>
+        </a>
+    </div>
+    <span class="floating-header-divider">&mdash;</span>
+    <div class="floating-header-title">Creating a CRUD API with AWS lambda and dynamoDB</div>
+    <div class="floating-header-share">
+        <div class="floating-header-share-label">Share this <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M7.5 15.5V4a1.5 1.5 0 1 1 3 0v4.5h2a1 1 0 0 1 1 1h2a1 1 0 0 1 1 1H18a1.5 1.5 0 0 1 1.5 1.5v3.099c0 .929-.13 1.854-.385 2.748L17.5 23.5h-9c-1.5-2-5.417-8.673-5.417-8.673a1.2 1.2 0 0 1 1.76-1.605L7.5 15.5zm6-6v2m-3-3.5v3.5m6-1v2"/>
+</svg>
+</div>
+        <a class="floating-header-share-tw" href="https://twitter.com/share?text=Creating+a+CRUD+API+with+AWS+lambda+and+dynamoDB&amp;url=https://headly48.github.ioaws-serverless-crud"
+            onclick="window.open(this.href, 'share-twitter', 'width=550,height=235');return false;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path d="M30.063 7.313c-.813 1.125-1.75 2.125-2.875 2.938v.75c0 1.563-.188 3.125-.688 4.625a15.088 15.088 0 0 1-2.063 4.438c-.875 1.438-2 2.688-3.25 3.813a15.015 15.015 0 0 1-4.625 2.563c-1.813.688-3.75 1-5.75 1-3.25 0-6.188-.875-8.875-2.625.438.063.875.125 1.375.125 2.688 0 5.063-.875 7.188-2.5-1.25 0-2.375-.375-3.375-1.125s-1.688-1.688-2.063-2.875c.438.063.813.125 1.125.125.5 0 1-.063 1.5-.25-1.313-.25-2.438-.938-3.313-1.938a5.673 5.673 0 0 1-1.313-3.688v-.063c.813.438 1.688.688 2.625.688a5.228 5.228 0 0 1-1.875-2c-.5-.875-.688-1.813-.688-2.75 0-1.063.25-2.063.75-2.938 1.438 1.75 3.188 3.188 5.25 4.25s4.313 1.688 6.688 1.813a5.579 5.579 0 0 1 1.5-5.438c1.125-1.125 2.5-1.688 4.125-1.688s3.063.625 4.188 1.813a11.48 11.48 0 0 0 3.688-1.375c-.438 1.375-1.313 2.438-2.563 3.188 1.125-.125 2.188-.438 3.313-.875z"/></svg>
+
+        </a>
+        <a class="floating-header-share-fb" href="https://www.facebook.com/sharer/sharer.php?u=https://headly48.github.ioaws-serverless-crud"
+            onclick="window.open(this.href, 'share-facebook','width=580,height=296');return false;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path d="M19 6h5V0h-5c-3.86 0-7 3.14-7 7v3H8v6h4v16h6V16h5l1-6h-6V7c0-.542.458-1 1-1z"/></svg>
+
+        </a>
+    </div>
+    <progress class="progress" value="0">
+        <div class="progress-container">
+            <span class="progress-bar"></span>
+        </div>
+    </progress>
+</div>
+
+
+<!-- /post -->
+
+<!-- The #contentFor helper here will send everything inside it up to the matching #block helper found in default.hbs -->
+
+
+        <!-- Previous/next page links - displayed on every page -->
+        
+
+        <!-- The footer at the very bottom of the screen -->
+        <footer class="site-footer outer">
+            <div class="site-footer-content inner">
+                <section class="copyright"><a href="http://localhost:4000/">Headly's blog of things</a> &copy; 2018</section>
+                <section class="poweredby">Proudly published with <a href="https://jekyllrb.com/">Jekyll</a> &
+                    <a href="https://pages.github.com/" target="_blank" rel="noopener">GitHub Pages</a> using
+                    <a href="https://github.com/jekyller/jasper2" target="_blank" rel="noopener">Jasper2</a></section>
+                <nav class="site-footer-nav">
+                    <a href="/">Latest Posts</a>
+                    
+                    
+                    <a href="https://ghost.org" target="_blank" rel="noopener">Ghost</a>
+                </nav>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- The big email subscribe modal content -->
+    
+
+    <!-- highlight.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.10.0/components/prism-abap.min.js"></script>
+    <script>$(document).ready(function() {
+      $('pre code').each(function(i, block) {
+        hljs.highlightBlock(block);
+      });
+    });</script>
+
+    <!-- jQuery + Fitvids, which makes all video embeds responsive -->
+    <script
+        src="https://code.jquery.com/jquery-3.2.1.min.js"
+        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+        crossorigin="anonymous">
+    </script>
+    <script type="text/javascript" src="/assets/js/jquery.fitvids.js"></script>
+    <script type="text/javascript" src="https://demo.ghost.io/assets/js/jquery.fitvids.js?v=724281a32e"></script>
+
+
+    <!-- Paginator increased to "infinit" in _config.yml -->
+    <!-- if paginator.posts  -->
+    <!-- <script>
+        var maxPages = parseInt('');
+    </script>
+    <script src="/assets/js/infinitescroll.js"></script> -->
+    <!-- /endif -->
+
+    
+
+
+    <!-- Add Google Analytics  -->
+    <!-- Google Analytics Tracking code -->
+ <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', '', 'auto');
+  ga('send', 'pageview');
+
+ </script>
+
+
+    <!-- The #block helper will pull in data from the #contentFor other template files. In this case, there's some JavaScript which we only want to use in post.hbs, but it needs to be included down here, after jQuery has already loaded. -->
+    
+        <script>
+
+// NOTE: Scroll performance is poor in Safari
+// - this appears to be due to the events firing much more slowly in Safari.
+//   Dropping the scroll event and using only a raf loop results in smoother
+//   scrolling but continuous processing even when not scrolling
+$(document).ready(function () {
+    // Start fitVids
+    var $postContent = $(".post-full-content");
+    $postContent.fitVids();
+    // End fitVids
+
+    var progressBar = document.querySelector('progress');
+    var header = document.querySelector('.floating-header');
+    var title = document.querySelector('.post-full-title');
+
+    var lastScrollY = window.scrollY;
+    var lastWindowHeight = window.innerHeight;
+    var lastDocumentHeight = $(document).height();
+    var ticking = false;
+
+    function onScroll() {
+        lastScrollY = window.scrollY;
+        requestTick();
+    }
+
+    function onResize() {
+        lastWindowHeight = window.innerHeight;
+        lastDocumentHeight = $(document).height();
+        requestTick();
+    }
+
+    function requestTick() {
+        if (!ticking) {
+            requestAnimationFrame(update);
+        }
+        ticking = true;
+    }
+
+    function update() {
+        var trigger = title.getBoundingClientRect().top + window.scrollY;
+        var triggerOffset = title.offsetHeight + 35;
+        var progressMax = lastDocumentHeight - lastWindowHeight;
+
+        // show/hide floating header
+        if (lastScrollY >= trigger + triggerOffset) {
+            header.classList.add('floating-active');
+        } else {
+            header.classList.remove('floating-active');
+        }
+
+        progressBar.setAttribute('max', progressMax);
+        progressBar.setAttribute('value', lastScrollY);
+
+        ticking = false;
+    }
+
+    window.addEventListener('scroll', onScroll, {passive: true});
+    window.addEventListener('resize', onResize, false);
+
+    update();
+});
+</script>
+
+    
+
+    <!-- Ghost outputs important scripts and data with this tag - it should always be the very last thing before the closing body tag -->
+    <!-- ghost_foot -->
+
+</body>
+</html>

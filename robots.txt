@@ -1,3 +1,0 @@
-User-agent: *
-Sitemap: http://headly48.github.io/sitemap.xml
-Disallow: /ghost/
